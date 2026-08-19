@@ -1,20 +1,9 @@
+bin/
 out/
-.venv/
-*.egg-info/
-__pycache__/
-*.pyc
-.pytest_cache/
-.ruff_cache/
-cases/cases.db          # 工作副本，真相在 cases/export/*.jsonl (D28)
-cases/cases.db-*
-.diskcache/
+reports/
+dist/
 .env
 .env.*
 !.env.example
-.langfuse/
-docs/metrics/           # 运行时生成的周报/校准报告（metrics.yml 产出 artifact）
-reports/
-coverage/
-dist/
 *.log
 .DS_Store

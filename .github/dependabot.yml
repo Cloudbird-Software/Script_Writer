@@ -7,7 +7,7 @@ updates:
       actions:
         patterns: ["*"]
         cooldown-days: 7
-  - package-ecosystem: pip
+  - package-ecosystem: gomod
     directory: "/"
     schedule: { interval: weekly }
     open-pull-requests-limit: 5

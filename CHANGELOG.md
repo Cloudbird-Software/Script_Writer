@@ -6,17 +6,15 @@
 
 ### Added
 - 初始模板工程（CI gate / hygiene / dependabot / automerge 全套护栏）。
-- 迁入 NSC（Narrative Spec Compiler）：spec 资产层、生成引擎（src/nsc）、
-  测试与 fixtures、ADR、飞轮数据真相（cases/export/*.jsonl）、监控 CI
-  （metrics / llm-eval / judge-calibration / rule-promotion）。
-- Makefile 对齐组织统一接口（setup/fmt/lint/arch/test/build/check，python + uv）。
+- songguard 项目起架：Go 1.25 模块、`cmd/songguard` CLI 骨架、Makefile Go 工具链
+  （lint=gofmt+go vet、arch=GO-3 边界检查、test=-race）、ADR-0001（语言切换与分期）。
 
 ### Changed
-- 监控 CI 对齐组织治理：BP-1（周报/校准不再直推 main，走 artifact/Issue/PR）、
-  CI-2/CI-3（Actions 全 SHA pin、最小权限、persist-credentials: false）、
-  lint+test 收敛进组织 check.yml 的 `make check`。
+- **语言切换 Python→Go**（ADR-0001，issue #1 批准）：仓库重定位为 songguard
+  跨集一致性校验工具（纯函数，零 LLM）；CI `check` runtime→go、dependabot→gomod、
+  README/AGENTS/ARCHITECTURE/CODEOWNERS/PR 模板按新结构重写。
+- Makefile 目标名保持组织统一接口，实现切 Go。
 
 ### Removed
-- 迁移过程文件：Engineering-Plan、docs/WORK_ORDERS.md、docs/UPGRADE_PLAN_*、
-  docs/RESEARCH_EXTERNAL_*、历史周报 docs/metrics/*、cases/cases.db（工作副本）、
-  .pre-commit-config.yaml、旧 rulesets/main.json、Node 模板残留（package.json 等）。
+- Python NSC 引擎及全部配套（src/tests/spec/adr 旧表/cases/监控 CI ×4 等 467 文件）：
+  LLM 编排职责与本仓新定位不符，保留于 git 历史（PR #3），M5 届期独立旁路仓重启。

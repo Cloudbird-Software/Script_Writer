@@ -9,12 +9,11 @@
 # 基建：CI/门禁/治理（变更影响全组织，显式归属）
 /.github/ @randypanding
 /Makefile @randypanding
+/go.mod @randypanding
+/go.sum @randypanding
 /zizmor.yml @randypanding
 /docs/ARCHITECTURE.md @randypanding
 
-# 资产层 A（改它必须 ADR + asset-change 标签）
-/spec/ @randypanding
-/profiles/ @randypanding
-/brands/ @randypanding
-/eval/ @randypanding
-/cases/export/ @randypanding
+# 资产层 A（改它必须 ADR + asset-change 标签）：canon 表 schema 与示例
+/internal/canon/ @randypanding
+/adr/ @randypanding
