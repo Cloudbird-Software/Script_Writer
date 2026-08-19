@@ -20,6 +20,9 @@ __pycache__/
 .coverage
 .coverage.*
 
+# BAML 生成客户端（sidecar/，构建产物不入库——改 baml_src 后跑 sidecar/generate.sh）
+sidecar/songguard_sidecar/baml_client/
+
 # Go / 测试产物
 testdata/rapid/
 *.fail

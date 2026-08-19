@@ -5,6 +5,12 @@
 ## [Unreleased]
 
 ### Added
+- M5 LLM 旁路 sidecar（ADR-0003）：`sidecar/` Python 进程，BAML 封装 prompt
+  （`baml_src/*.baml` = prompt SSOT，git 即版本管理）+ 唯一 HTTP 端点
+  `POST /v1/llm-check`（Pass 1 一致性巡检 sweep / Pass 3 观众模拟 reader）。
+  默认 provider=mock（内置 OpenAI 兼容 mock LLM，走完整 BAML 渲染/解析管线），
+  真实 LLM 走任意 OpenAI 兼容端点（env 配置）。`fixtures/llm_contract.json`
+  为 Go/Python 双侧共享契约期望。LLM 结论一律建议级，阻断决策留在 Go 规则门禁。
 - M4 声音指纹门 `voice`（软门 13，规则版）：引号台词按规则版归属（说话语境中
   唯一具名角色）分桶，各角色平均台词长度的标准差 < min_profile_spread 即 warn
   （"所有人说话一个味儿"；文白比/口头禅深查与代词消解属 M5 LLM 旁路）。
