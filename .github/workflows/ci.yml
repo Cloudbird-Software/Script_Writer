@@ -18,8 +18,8 @@ jobs:
   check:
     uses: Cloudbird-Software/CI-Workflows/.github/workflows/check.yml@v1
     with:
-      runtime: node
-      node-version: "24"
+      runtime: python
+      python-version: "3.12"
 
   deps:
     if: github.event_name == 'pull_request'
