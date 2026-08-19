@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/Cloudbird-Software/Script_Writer/internal/canon"
+	"github.com/Cloudbird-Software/Script_Writer/internal/rules"
 	"github.com/Cloudbird-Software/Script_Writer/internal/state"
 )
 
@@ -16,7 +17,7 @@ func QuoteGrounding(c *canon.Canon, eps []state.Episode, _ []state.Snapshot) []s
 	triggers := []string{"想起", "记得", "回忆", "当年", "曾说", "说过", "那句话", "约定", "那句"}
 	var prior strings.Builder // 归一化前文语料（逐集累积）
 	for _, ep := range eps {
-		sents := Sentences(ep.Text)
+		sents := rules.Sentences(ep.Text)
 		for si, sent := range sents {
 			hasTrigger := false
 			for _, tr := range triggers {
@@ -43,7 +44,7 @@ func QuoteGrounding(c *canon.Canon, eps []state.Episode, _ []state.Snapshot) []s
 				}
 			}
 		}
-		prior.WriteString(normalize(ep.Text))
+		prior.WriteString(rules.Normalize(ep.Text))
 	}
 	return vs
 }
@@ -71,7 +72,7 @@ func grounded(q, corpus string) bool {
 	if corpus == "" {
 		return false
 	}
-	nq := normalize(q)
+	nq := rules.Normalize(q)
 	if len([]rune(nq)) < 2 {
 		return true // 过短无法判定，不拦
 	}
@@ -87,7 +88,7 @@ func grounded(q, corpus string) bool {
 		}
 		for s := 0; s+w <= len(rc); s++ {
 			window := rc[s : s+w]
-			d := lev(rq, window)
+			d := rules.Lev(string(rq), string(window))
 			sim := 1 - float64(d)/float64(max(len(rq), w))
 			if sim >= 0.8 {
 				return true
@@ -114,7 +115,7 @@ func HookPayoff(c *canon.Canon, eps []state.Episode, snaps []state.Snapshot) []s
 		}
 		// 相邻集钩接（下一集开头 300 字承接）。
 		if i+1 < len(eps) {
-			opening := FirstN(eps[i+1].Text, 300)
+			opening := rules.FirstN(eps[i+1].Text, 300)
 			for _, h := range ep.Delta.HooksOpened {
 				if len(h.PickupKeywords) == 0 {
 					vs = append(vs, state.Violation{
@@ -137,7 +138,7 @@ func HookPayoff(c *canon.Canon, eps []state.Episode, snaps []state.Snapshot) []s
 						Gate: state.GateHookPayoff, Episode: ep.Ep,
 						Position: "delta.hooks_opened." + h.LoopID,
 						Expected: fmt.Sprintf("E%d 开头 300 字内出现 %v 之一", eps[i+1].Ep, h.PickupKeywords),
-						Actual:   FirstN(opening, 20) + "…",
+						Actual:   rules.FirstN(opening, 20) + "…",
 						Severity: state.SeverityError,
 						Message:  "相邻集钩子断裂（E14→E15 类因果断裂）",
 					})

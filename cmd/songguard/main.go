@@ -1,21 +1,18 @@
-// songguard——小说/短剧跨集一致性校验工具（Go 库 + thin CLI）。
+// songguard——小说/短剧跨集一致性校验工具（thin CLI）。
 //
-// 输入：六张 canon 表(YAML) + 各集正文 + 各集 delta 申报
-// 输出：结构化违规报告 + 交付五件套报表（见 internal/passes）。
+// 深接口纪律：本文件只做参数解析与输出，业务全部经由唯一门面 internal/songguard。
 //
 //	songguard check <manifest.yaml>   全量校验 + 报表
 //	songguard linkage -manifest <m.yaml> -ep <N>   重跑 ±1 集联动校验
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
 
-	"github.com/Cloudbird-Software/Script_Writer/internal/passes"
-	"github.com/Cloudbird-Software/Script_Writer/internal/state"
+	"github.com/Cloudbird-Software/Script_Writer/internal/songguard"
 )
 
 var version = "dev"
@@ -56,15 +53,6 @@ func main() {
 	}
 }
 
-// checkReport 是 stdout 摘要 JSON 的形态。
-type checkReport struct {
-	Blocked     bool              `json:"blocked"`
-	Errors      int               `json:"errors"`
-	Warns       int               `json:"warns"`
-	Suggestions int               `json:"suggestions"`
-	Violations  []state.Violation `json:"violations"`
-}
-
 func runCheck(args []string) int {
 	fs := flag.NewFlagSet("check", flag.ExitOnError)
 	outDir := fs.String("out", ".", "报表输出目录")
@@ -75,12 +63,8 @@ func runCheck(args []string) int {
 		fmt.Fprintf(os.Stderr, "用法: songguard check [-out <dir>] <manifest.yaml>\n")
 		return 2
 	}
-	c, eps, err := passes.LoadManifest(fs.Arg(0))
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "songguard: %v\n", err)
-		return 2
-	}
-	res, err := passes.Run(c, eps)
+	g := songguard.New()
+	rep, err := g.Check(fs.Arg(0))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "songguard: %v\n", err)
 		return 2
@@ -91,9 +75,9 @@ func runCheck(args []string) int {
 		return 2
 	}
 	files := map[string]string{
-		"deliverable.md":  res.Deliverable.RenderMarkdown(),
-		"sweep.md":        passes.RenderSuggestionsMarkdown(res.Suggestions),
-		"violations.json": mustJSONIndent(res.Violations),
+		"deliverable.md":  rep.RenderDeliverableMarkdown(),
+		"sweep.md":        rep.RenderSweepMarkdown(),
+		"violations.json": rep.ViolationsJSON(),
 	}
 	for name, content := range files {
 		if err := os.WriteFile(filepath.Join(*outDir, name), []byte(content), 0o644); err != nil {
@@ -102,22 +86,10 @@ func runCheck(args []string) int {
 		}
 	}
 
-	rep := checkReport{
-		Blocked:     res.Deliverable.Blocked,
-		Suggestions: len(res.Suggestions),
-		Violations:  res.Violations,
-	}
-	for _, v := range res.Violations {
-		switch v.Severity {
-		case state.SeverityError:
-			rep.Errors++
-		case state.SeverityWarn:
-			rep.Warns++
-		}
-	}
-	fmt.Println(mustJSONIndent(rep))
-	if res.HasError() {
-		fmt.Fprintf(os.Stderr, "songguard: 存在硬失败（errors=%d, blocked=%v），详见 violations.json\n", rep.Errors, rep.Blocked)
+	fmt.Println(rep.SummaryJSON())
+	if rep.HasError() {
+		errs, _, _ := rep.Counts()
+		fmt.Fprintf(os.Stderr, "songguard: 存在硬失败（errors=%d, blocked=%v），详见 violations.json\n", errs, rep.Blocked())
 		return 1
 	}
 	return 0
@@ -134,35 +106,19 @@ func runLinkage(args []string) int {
 		fmt.Fprintf(os.Stderr, "用法: songguard linkage -manifest <m.yaml> -ep <N>\n")
 		return 2
 	}
-	c, eps, err := passes.LoadManifest(*manifest)
+	g := songguard.New()
+	out, err := g.Linkage(*manifest, *ep)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "songguard: %v\n", err)
 		return 2
 	}
-	vs := passes.Linkage(c, eps, *ep)
-	if len(vs) == 0 {
-		fmt.Printf("OK: E%d ±1 集联动承接完整（前集钩子已承接、本集钩子已有下文）\n", *ep)
+	if out.OK() {
+		fmt.Println(out.Render())
 		return 0
 	}
-	fmt.Fprint(os.Stderr, state.FormatViolations(vs))
-	hasErr := false
-	for _, v := range vs {
-		if v.Severity == state.SeverityError {
-			hasErr = true
-		}
-	}
-	if hasErr {
+	fmt.Fprint(os.Stderr, out.Render())
+	if out.HasError() {
 		return 1
 	}
-	fmt.Println("OK: 仅有 warn 级提示（如未申报 pickup_keywords），无联动断裂")
 	return 0
-}
-
-func mustJSONIndent(v any) string {
-	b, err := json.MarshalIndent(v, "", "  ")
-	if err != nil {
-		// 仅对受控结构序列化，不可达；保守返回空对象。
-		return "{}"
-	}
-	return string(b)
 }

@@ -1,11 +1,13 @@
-// Package passes 实现 M3 全局 pass（issue #1 §C/D）：
+// Package engine 是编排层：manifest 加载 + 门禁注册表 + 全局 pass（issue #1 §C/D）。
 //
-//	Manifest    加载 manifest.yaml（canon 目录 + 各集正文 + delta 申报）
-//	Run         全量编排：canon 结构校验 → 状态台账 apply → 五道门禁 → 结算
-//	LedgerClose 交付五件套报表（人物表/伏笔台账/卖点覆盖表/风险清单/每集 beat+钩子表）
-//	Sweep       一致性巡检规则版：只输出 diff 建议，绝不重写全文
-//	Linkage     重跑 ±1 集联动校验（E14→E15 类重跑断裂）
-package passes
+//	LoadManifest 加载 manifest.yaml（canon 目录 + 各集正文 + delta 申报）
+//	Run          全量编排：canon 结构校验 → 状态台账 apply → 全部门禁 → 结算
+//	LedgerClose  交付五件套报表（人物表/伏笔台账/卖点覆盖表/风险清单/每集 beat+钩子表）
+//	Sweep        一致性巡检规则版：只输出 diff 建议，绝不重写全文
+//	Linkage      重跑 ±1 集联动校验（E14→E15 类重跑断裂）
+//
+// 本包只被 internal/songguard 门面调用（深接口：对外暴露的唯一入口在门面包）。
+package engine
 
 import (
 	"fmt"

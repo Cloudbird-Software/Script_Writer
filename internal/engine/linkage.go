@@ -1,11 +1,11 @@
-package passes
+package engine
 
 import (
 	"fmt"
 	"strings"
 
 	"github.com/Cloudbird-Software/Script_Writer/internal/canon"
-	"github.com/Cloudbird-Software/Script_Writer/internal/gates"
+	"github.com/Cloudbird-Software/Script_Writer/internal/rules"
 	"github.com/Cloudbird-Software/Script_Writer/internal/state"
 )
 
@@ -46,7 +46,7 @@ func Linkage(c *canon.Canon, eps []state.Episode, rerunEp int) []state.Violation
 // checkJoints 校验 from 集的钩子在 to 集开头 300 字内被承接。
 func checkJoints(from, to state.Episode) []state.Violation {
 	var vs []state.Violation
-	opening := gates.FirstN(to.Text, 300)
+	opening := rules.FirstN(to.Text, 300)
 	for _, h := range from.Delta.HooksOpened {
 		if len(h.PickupKeywords) == 0 {
 			vs = append(vs, state.Violation{
@@ -70,7 +70,7 @@ func checkJoints(from, to state.Episode) []state.Violation {
 				Gate: "linkage", Episode: to.Ep,
 				Position: "loop." + h.LoopID,
 				Expected: fmt.Sprintf("E%d 开头 300 字内出现 %v 之一", to.Ep, h.PickupKeywords),
-				Actual:   gates.FirstN(opening, 20) + "…",
+				Actual:   rules.FirstN(opening, 20) + "…",
 				Severity: state.SeverityError,
 				Message:  fmt.Sprintf("重跑 ±1 联动断裂：E%d 钩子未被 E%d 承接（E14→E15 类缺陷）", from.Ep, to.Ep),
 			})

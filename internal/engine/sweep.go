@@ -1,4 +1,4 @@
-package passes
+package engine
 
 import (
 	"fmt"
@@ -6,7 +6,8 @@ import (
 	"strings"
 
 	"github.com/Cloudbird-Software/Script_Writer/internal/canon"
-	"github.com/Cloudbird-Software/Script_Writer/internal/gates"
+	"github.com/Cloudbird-Software/Script_Writer/internal/rules"
+	"github.com/Cloudbird-Software/Script_Writer/internal/rules/gates"
 	"github.com/Cloudbird-Software/Script_Writer/internal/state"
 )
 
@@ -44,7 +45,7 @@ func Sweep(c *canon.Canon, eps []state.Episode) []Suggestion {
 		if sentNo < 1 {
 			continue
 		}
-		sents := gates.Sentences(epList[0].Text)
+		sents := rules.Sentences(epList[0].Text)
 		if sentNo > len(sents) {
 			continue
 		}

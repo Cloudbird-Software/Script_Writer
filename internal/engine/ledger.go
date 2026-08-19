@@ -1,4 +1,4 @@
-package passes
+package engine
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/Cloudbird-Software/Script_Writer/internal/canon"
-	"github.com/Cloudbird-Software/Script_Writer/internal/gates"
+	"github.com/Cloudbird-Software/Script_Writer/internal/rules"
 	"github.com/Cloudbird-Software/Script_Writer/internal/state"
 )
 
@@ -27,7 +27,7 @@ func (r *Result) HasError() bool {
 	return r.Deliverable.Blocked
 }
 
-// Run 全量编排：canon 结构校验 → 逐集 apply（state 违规）→ 五道门禁 → 结算。
+// Run 全量编排：canon 结构校验 → 逐集 apply（state 违规）→ 注册表全部门禁 → 结算。
 func Run(c *canon.Canon, eps []state.Episode) (*Result, error) {
 	var vs []state.Violation
 
@@ -47,25 +47,17 @@ func Run(c *canon.Canon, eps []state.Episode) (*Result, error) {
 	}
 	snaps := e.Snapshots()
 
-	// 3. 五道硬门。
-	vs = append(vs, runGates(c, eps, snaps)...)
+	// 3. 注册表驱动的全部门禁。
+	in := rules.Input{Canon: c, Episodes: eps, Snapshots: snaps}
+	for _, r := range allRules() {
+		vs = append(vs, r.Check(in)...)
+	}
 
 	// 4. 结算 + 巡检建议。
 	res := &Result{Violations: vs}
 	res.Deliverable = LedgerClose(c, eps, snaps, vs)
 	res.Suggestions = Sweep(c, eps)
 	return res, nil
-}
-
-// runGates 执行 M2 五道门。
-func runGates(c *canon.Canon, eps []state.Episode, snaps []state.Snapshot) []state.Violation {
-	var vs []state.Violation
-	vs = append(vs, gates.Format(c, eps, snaps)...)
-	vs = append(vs, gates.Consistency(c, eps, snaps)...)
-	vs = append(vs, gates.Relationship(c, eps, snaps)...)
-	vs = append(vs, gates.QuoteGrounding(c, eps, snaps)...)
-	vs = append(vs, gates.HookPayoff(c, eps, snaps)...)
-	return vs
 }
 
 // ----------------------------------------------------------------------------

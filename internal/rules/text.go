@@ -1,14 +1,4 @@
-// Package gates 实现 M2 五道硬门（issue #1 §B-2，全部纯函数、零 LLM）：
-//
-//	Format         格式门：字数区间 ±10%、全半角统一、人名禁非中文字符、无 markdown 残留
-//	Consistency    一致性门：forbidden_names 精确比对 + 称谓/地名后缀漂移检测
-//	Relationship   关系门：已有相遇记录的角色禁止"初次相识"叙事
-//	QuoteGrounding 引文接地门："想起某人说过"必须能在前文逐字或近似检索到出处
-//	HookPayoff     钩子/回收门：每集必有钩子/按钮、悬置时限、P0 结局前清账、相邻集钩接
-//
-// 输入：canon + 各集正文（[]state.Episode）+ 各集后快照（[]state.Snapshot，与 eps 等长同序）。
-// 输出：[]state.Violation。门禁不改写正文、不动台账。
-package gates
+package rules
 
 import (
 	"strings"
@@ -63,6 +53,15 @@ func FirstN(text string, n int) string {
 	return b.String()
 }
 
+// LastN 返回文本末 n 个 rune。
+func LastN(text string, n int) string {
+	rs := []rune(text)
+	if len(rs) <= n {
+		return text
+	}
+	return string(rs[len(rs)-n:])
+}
+
 var fullWidthPunct = "，。：；！？“”‘’（）《》、—…·"
 var halfWidthPunct = ",:;!?\"'()"
 
@@ -81,7 +80,9 @@ func PunctMix(text string) (fullSample, halfSample string, mixed bool) {
 	return f, h, f != "" && h != ""
 }
 
-func isHan(r rune) bool { return unicode.Is(unicode.Han, r) }
+// IsHan 报告 r 是否汉字。
+func IsHan(r rune) bool { return unicode.Is(unicode.Han, r) }
+
 func isLatin(r rune) bool {
 	return (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z')
 }
@@ -103,8 +104,8 @@ func MixedScriptNames(text string) []string {
 		}
 		runLen := j - i
 		if runLen == 1 {
-			prevHan := i > 0 && isHan(runes[i-1])
-			nextHan := j < len(runes) && isHan(runes[j])
+			prevHan := i > 0 && IsHan(runes[i-1])
+			nextHan := j < len(runes) && IsHan(runes[j])
 			if prevHan || nextHan {
 				start := i
 				if prevHan {
@@ -138,8 +139,8 @@ func MarkdownResidue(text string) []string {
 	return out
 }
 
-// normalize 供引文接地：去空白与标点，只留实义字符。
-func normalize(s string) string {
+// Normalize 供引文接地：去空白与标点，只留实义字符。
+func Normalize(s string) string {
 	var b strings.Builder
 	for _, r := range s {
 		if unicode.IsSpace(r) || unicode.IsPunct(r) || unicode.IsSymbol(r) {
@@ -176,6 +177,9 @@ func lev(a, b []rune) int {
 	}
 	return prev[len(b)]
 }
+
+// Lev 导出编辑距离（子包门禁复用）。
+func Lev(a, b string) int { return lev([]rune(a), []rune(b)) }
 
 func min3(a, b, c int) int {
 	if b < a {
