@@ -1,0 +1,6 @@
+timeline:
+  - {ep: 1, date: 某年三月初一, day: 1, season: spring, weather: 晴, time_of_day: 晚}
+  - {ep: 2, date: 某年三月初二, day: 2, season: spring, weather: 阴, time_of_day: 午}
+  - {ep: 3, date: 某年三月初五, day: 5, season: spring, weather: 晴, time_of_day: 晨}
+  - {ep: 4, date: 某年三月初六, day: 6, season: spring, weather: 雨, time_of_day: 晚}
+  - {ep: 5, date: 某年三月初七, day: 7, season: spring, weather: 晴, time_of_day: 午}
