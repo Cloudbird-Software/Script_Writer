@@ -2,6 +2,7 @@ package engine
 
 import (
 	"github.com/Cloudbird-Software/Script_Writer/internal/rules"
+	"github.com/Cloudbird-Software/Script_Writer/internal/rules/arc"
 	"github.com/Cloudbird-Software/Script_Writer/internal/rules/emotion"
 	"github.com/Cloudbird-Software/Script_Writer/internal/rules/gates"
 	"github.com/Cloudbird-Software/Script_Writer/internal/rules/hygiene"
@@ -22,5 +23,6 @@ func allRules() []rules.Rule {
 		hygiene.Rule(),       // 门 2：文本卫生（错别字/乱码/生僻字）
 		lineownership.Rule(), // 门 6：台词归属（slogan 塞错嘴/用量申报不符）
 		emotion.Rule(),       // 软门 14：情绪曲线（连续同类型即 fail）
+		arc.Rule(),           // 门 9：弧线（起点/升速/代价）
 	}
 }
