@@ -40,6 +40,7 @@ const (
 	GateArc            = "arc"           // M4 门 9：弧线
 	GateBrand          = "brand"         // M4 门 10：营销
 	GateCompliance     = "compliance"    // M4 门 11：品牌安全
+	GateProducibility  = "producibility" // M4 门 12：可拍性
 )
 
 // Violation 是全工具统一的违规报告单元（issue #1 §三 输出契约）。
