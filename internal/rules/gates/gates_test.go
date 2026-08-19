@@ -7,12 +7,13 @@ import (
 	rapid "pgregory.net/rapid"
 
 	"github.com/Cloudbird-Software/Script_Writer/internal/canon"
+	"github.com/Cloudbird-Software/Script_Writer/internal/rules"
 	"github.com/Cloudbird-Software/Script_Writer/internal/state"
 )
 
 func demoCanon(t *testing.T) *canon.Canon {
 	t.Helper()
-	c, err := canon.Load("../canon/testdata/demo")
+	c, err := canon.Load("../../canon/testdata/demo")
 	if err != nil {
 		t.Fatalf("load demo canon: %v", err)
 	}
@@ -243,8 +244,8 @@ func TestHookPayoffAgingAndP0Ledger(t *testing.T) {
 
 // PBT：纯中文标点文本永不报"混用"；注入任一半角标点必报。
 func TestPropertyPunctMixDetection(t *testing.T) {
-	fullRunes := []rune(fullWidthPunct)
-	halfRunes := []rune(halfWidthPunct)
+	fullRunes := []rune("，。：；！？“”‘’（）《》、—…·")
+	halfRunes := []rune(",:;!?\"'()")
 	rapid.Check(t, func(t *rapid.T) {
 		body := rapid.StringMatching(`[一-龥]{1,12}`).Draw(t, "body")
 		full := rapid.SampledFrom(fullRunes).Draw(t, "full")
@@ -252,10 +253,10 @@ func TestPropertyPunctMixDetection(t *testing.T) {
 		if rapid.Bool().Draw(t, "inject") {
 			half := rapid.SampledFrom(halfRunes).Draw(t, "half")
 			text += string(half)
-			if _, _, mixed := PunctMix(text); !mixed {
+			if _, _, mixed := rules.PunctMix(text); !mixed {
 				t.Fatalf("注入半角 %q 后未判混用：%q", string(half), text)
 			}
-		} else if _, _, mixed := PunctMix(text); mixed {
+		} else if _, _, mixed := rules.PunctMix(text); mixed {
 			t.Fatalf("纯全角被判混用：%q", text)
 		}
 	})
@@ -266,7 +267,7 @@ func TestPropertyExactQuoteAlwaysGrounded(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
 		prior := strings.Join(rapid.SliceOf(rapid.StringMatching(`[一-龥]{2,8}`)).Draw(t, "prior"), "。")
 		q := rapid.StringMatching(`[一-龥]{2,6}`).Draw(t, "q")
-		corpus := normalize(prior + "。" + q)
+		corpus := rules.Normalize(prior + "。" + q)
 		if !grounded(q, corpus) {
 			t.Fatalf("逐字出现的引文未接地：%q in %q", q, corpus)
 		}

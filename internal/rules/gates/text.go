@@ -1,3 +1,10 @@
+// Package gates 保留 M2 五道硬门（issue #1 §B-2）中的文本三门的纯函数实现：
+//
+//	Format         格式门：字数区间 ±10%、全半角统一、人名禁非中文字符、无 markdown 残留
+//	Consistency    一致性门：forbidden_names 精确比对 + 称谓/地名后缀漂移检测
+//	Relationship   关系门：已有相遇记录的角色禁止"初次相识"叙事
+//
+// M4 各域门禁按深接口纪律逐个独立成 rules/<gate> 子包；本包不再扩容。
 package gates
 
 import (
@@ -5,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/Cloudbird-Software/Script_Writer/internal/canon"
+	"github.com/Cloudbird-Software/Script_Writer/internal/rules"
 	"github.com/Cloudbird-Software/Script_Writer/internal/state"
 )
 
@@ -14,8 +22,7 @@ import (
 func Format(c *canon.Canon, eps []state.Episode, _ []state.Snapshot) []state.Violation {
 	var vs []state.Violation
 	for _, ep := range eps {
-		sents := Sentences(ep.Text)
-		n := CountChars(ep.Text)
+		n := rules.CountChars(ep.Text)
 		if ep.TargetChars > 0 {
 			lo := float64(ep.TargetChars) * 0.9
 			hi := float64(ep.TargetChars) * 1.1
@@ -28,7 +35,7 @@ func Format(c *canon.Canon, eps []state.Episode, _ []state.Snapshot) []state.Vio
 				})
 			}
 		}
-		if f, h, mixed := PunctMix(ep.Text); mixed {
+		if f, h, mixed := rules.PunctMix(ep.Text); mixed {
 			vs = append(vs, state.Violation{
 				Gate: state.GateFormat, Episode: ep.Ep, Position: "标点",
 				Expected: "全半角统一（同一交付物一种字符集）",
@@ -36,21 +43,20 @@ func Format(c *canon.Canon, eps []state.Episode, _ []state.Snapshot) []state.Vio
 				Severity: state.SeverityError, Message: "全半角标点混用（E3/E17/E21/E24 类缺陷）",
 			})
 		}
-		for _, m := range MixedScriptNames(ep.Text) {
+		for _, m := range rules.MixedScriptNames(ep.Text) {
 			vs = append(vs, state.Violation{
 				Gate: state.GateFormat, Episode: ep.Ep, Position: "混排名",
 				Expected: "纯中文名或登记别名", Actual: m,
 				Severity: state.SeverityError, Message: "单字母与汉字混排的疑似人名（E9 A福 类）",
 			})
 		}
-		for _, md := range MarkdownResidue(ep.Text) {
+		for _, md := range rules.MarkdownResidue(ep.Text) {
 			vs = append(vs, state.Violation{
 				Gate: state.GateFormat, Episode: ep.Ep, Position: "markdown",
 				Expected: "交付正文无 markdown 残留", Actual: md,
 				Severity: state.SeverityError, Message: "markdown 残留",
 			})
 		}
-		_ = sents
 	}
 	return vs
 }
@@ -62,7 +68,7 @@ func Consistency(c *canon.Canon, eps []state.Episode, _ []state.Snapshot) []stat
 	var vs []state.Violation
 	known := c.KnownNames() // name → entity id
 	for _, ep := range eps {
-		for si, sent := range Sentences(ep.Text) {
+		for si, sent := range rules.Sentences(ep.Text) {
 			pos := fmt.Sprintf("第%d句", si+1)
 			for _, e := range c.Entities {
 				for _, f := range e.ForbiddenNames {
@@ -83,7 +89,7 @@ func Consistency(c *canon.Canon, eps []state.Episode, _ []state.Snapshot) []stat
 						continue
 					}
 					for name := range known {
-						if strings.HasSuffix(name, title) && Similarity(cand, name) >= 0.5 && lev([]rune(cand), []rune(name)) <= 1 {
+						if strings.HasSuffix(name, title) && rules.Similarity(cand, name) >= 0.5 && rules.Lev(cand, name) <= 1 {
 							vs = append(vs, state.Violation{
 								Gate: state.GateConsistency, Episode: ep.Ep, Position: pos,
 								Expected: name, Actual: cand,
@@ -123,7 +129,7 @@ func titleCandidates(sent, title string) []string {
 			continue
 		}
 		start := i
-		for start > 0 && i-start < 3 && isHan(rs[start-1]) {
+		for start > 0 && i-start < 3 && rules.IsHan(rs[start-1]) {
 			start--
 		}
 		if start == i { // 称谓前无名字
@@ -156,7 +162,7 @@ func Relationship(c *canon.Canon, eps []state.Episode, snaps []state.Snapshot) [
 			continue
 		}
 		before := snaps[i-1] // 进入本集前的世界状态
-		sents := Sentences(ep.Text)
+		sents := rules.Sentences(ep.Text)
 		for si, sent := range sents {
 			hit := false
 			for _, m := range markers {
