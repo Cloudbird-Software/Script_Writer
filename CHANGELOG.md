@@ -5,6 +5,11 @@
 ## [Unreleased]
 
 ### Added
+- M4 资产层（ADR-0002）：canon 第七张表 `config.yaml`（可选）——九道门禁的阈值与词表
+  （格式容差 / 钩子悬置阈值 / 错别字与乱码表 / 情绪类型 / 弧线等级轨 / 可拍性配额与镜头语言 /
+  合规分级词表 / 新鲜度阈值 / 声音指纹容差），缺省走 `WithDefaults()`（默认词表直接取材
+  issue #1 已发生缺陷）；delta 协议新增 `arc{level,cost}` / `scenes` / `crowd` 申报，
+  台账新增主角等级轨（单调不倒退、单步 ≤+1）与群演累计。
 - 初始模板工程（CI gate / hygiene / dependabot / automerge 全套护栏）。
 - songguard 项目起架：Go 1.25 模块、`cmd/songguard` CLI 骨架、Makefile Go 工具链
   （lint=gofmt+go vet、arch=GO-3 边界检查、test=-race）、ADR-0001（语言切换与分期）。

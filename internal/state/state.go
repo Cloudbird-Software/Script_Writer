@@ -64,6 +64,9 @@ type Delta struct {
 	Time         *TimeAdvance `yaml:"time"`
 	NewFacts     []string     `yaml:"new_facts"`
 	StateChanges []string     `yaml:"state_changes"`
+	Arc          *ArcAdvance  `yaml:"arc"`    // M4：主角权限等级申报（升级必须写 cost）
+	Scenes       []string     `yaml:"scenes"` // M4：本集场景列表（可拍性门校验 ≤N）
+	Crowd        bool         `yaml:"crowd"`  // M4：本集是否有群演场面（全剧配额）
 }
 
 // Meeting 一次首次相遇申报（entity id 对）。
@@ -100,6 +103,13 @@ type TimeAdvance struct {
 	Season string `yaml:"season"`
 }
 
+// ArcAdvance 是主角权限等级申报（M4 弧线门，issue #1 §B-2 门 9）：
+// 升级（level 高于台账当前值）必须填写 Cost——"她付出了什么"。
+type ArcAdvance struct {
+	Level int    `yaml:"level"`
+	Cost  string `yaml:"cost"`
+}
+
 // Episode 是一集的完整输入：正文 + 元信息 + delta 申报。
 type Episode struct {
 	Ep          int    `yaml:"ep"`
@@ -131,6 +141,9 @@ type Ledger struct {
 	LineTotals map[string]int
 	LinePerEp  map[string]map[int]int // line id → ep → count
 	LastDay    int
+	ArcLevel   int   // 主角当前权限等级（-1 = 尚未申报）
+	ArcSetEp   int   // 最近一次等级变更所在集（弧线门用其算升速）
+	CrowdEps   []int // 群演场面的集号列表（可拍性门配额用）
 	AppliedEps []int
 }
 
@@ -143,6 +156,7 @@ func NewLedger(c *canon.Canon) *Ledger {
 		LineTotals: map[string]int{},
 		LinePerEp:  map[string]map[int]int{},
 		LastDay:    0,
+		ArcLevel:   -1,
 	}
 	for _, p := range c.Props {
 		for _, inst := range p.Instances {
@@ -175,6 +189,10 @@ type Snapshot struct {
 	PropStates map[string]string // 截至本集的道具状态
 	LineTotals map[string]int
 	LastDay    int
+	ArcLevel   int      // 截至本集的主角权限等级（-1 = 未申报）
+	ArcSetEp   int      // 最近一次等级变更集
+	Scenes     []string // 本集申报的场景（可拍性门消费）
+	Crowd      bool     // 本集是否群演场面
 }
 
 // NewEngine 创建状态机引擎。
@@ -354,8 +372,33 @@ func (e *Engine) ApplyEp(ep Episode) []Violation {
 		l.LastDay = t.Day
 	}
 
+	// 8. 主角权限等级（M4）：台账层管两件事——单调不减、单步 ≤+1。
+	//    升速（每5集最多+1）与 cost 必填属弧线门（config 阈值），不在此处。
+	if a := ep.Delta.Arc; a != nil {
+		if l.ArcLevel >= 0 {
+			if a.Level < l.ArcLevel {
+				vs = append(vs, Violation{Gate: GateState, Episode: ep.Ep, Position: "delta.arc.level",
+					Expected: fmt.Sprintf("≥%d（弧线等级单调不倒退）", l.ArcLevel), Actual: fmt.Sprint(a.Level),
+					Severity: SeverityError, Message: "主角权限等级倒退"})
+			} else if a.Level > l.ArcLevel+1 {
+				vs = append(vs, Violation{Gate: GateState, Episode: ep.Ep, Position: "delta.arc.level",
+					Expected: fmt.Sprintf("≤%d（单集最多 +1）", l.ArcLevel+1), Actual: fmt.Sprint(a.Level),
+					Severity: SeverityError, Message: "主角权限等级跳级"})
+			}
+		}
+		if a.Level != l.ArcLevel {
+			l.ArcSetEp = ep.Ep
+		}
+		l.ArcLevel = a.Level
+	}
+
+	// 9. 群演场面登记（可拍性门按全剧配额判定，台账只记账）。
+	if ep.Delta.Crowd {
+		l.CrowdEps = append(l.CrowdEps, ep.Ep)
+	}
+
 	l.AppliedEps = append(l.AppliedEps, ep.Ep)
-	e.history = append(e.history, l.snapshot(ep.Ep))
+	e.history = append(e.history, l.snapshot(ep))
 	return vs
 }
 
@@ -366,14 +409,18 @@ func loopState(l *Loop) string {
 	return fmt.Sprintf("已回收于 E%d", l.ClosedEp)
 }
 
-func (l *Ledger) snapshot(ep int) Snapshot {
+func (l *Ledger) snapshot(ep Episode) Snapshot {
 	s := Snapshot{
-		Ep:         ep,
+		Ep:         ep.Ep,
 		Loops:      make([]Loop, 0, len(l.Loops)),
 		MetPairs:   map[string]int{},
 		PropStates: map[string]string{},
 		LineTotals: map[string]int{},
 		LastDay:    l.LastDay,
+		ArcLevel:   l.ArcLevel,
+		ArcSetEp:   l.ArcSetEp,
+		Scenes:     append([]string(nil), ep.Delta.Scenes...),
+		Crowd:      ep.Delta.Crowd,
 	}
 	for _, lp := range l.Loops {
 		s.Loops = append(s.Loops, *lp)

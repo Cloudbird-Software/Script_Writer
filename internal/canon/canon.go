@@ -28,9 +28,10 @@ const (
 	TableLines         = "lines"
 	TableSellingPoints = "selling_points"
 	TableTimeline      = "timeline"
+	TableConfig        = "config" // 第七张表（M4）：门禁配置，可选
 )
 
-// Canon 是六张表的聚合根；对 YAML 目录 Load 后经 Validate 才可交给 state/gates 使用。
+// Canon 是六张表 + 可选 config 的聚合根；对 YAML 目录 Load 后经 Validate 才可交给 state/gates 使用。
 type Canon struct {
 	Meta          Meta                `yaml:"meta"`
 	Entities      []Entity            `yaml:"entities"`
@@ -39,6 +40,7 @@ type Canon struct {
 	Lines         []Line              `yaml:"lines"`
 	SellingPoints SellingPointsConfig `yaml:"selling_points"`
 	Timeline      []TimelineEntry     `yaml:"timeline"`
+	Config        Config              `yaml:"config"`
 }
 
 // Meta 承载漂移检测所需的全局词表（人称谓后缀、地名后缀）。
@@ -158,10 +160,12 @@ func Load(dir string) (*Canon, error) {
 			return nil, fmt.Errorf("canon: %s.yaml 解析失败: %w", name, err)
 		}
 	}
-	// meta.yaml 可选。
-	if raw, err := os.ReadFile(filepath.Join(dir, "meta.yaml")); err == nil {
-		if err := yaml.Unmarshal(raw, c); err != nil {
-			return nil, fmt.Errorf("canon: meta.yaml 解析失败: %w", err)
+	// meta.yaml / config.yaml 可选（M4：config 缺省时各门禁用 WithDefaults 默认值）。
+	for _, name := range []string{"meta", TableConfig} {
+		if raw, err := os.ReadFile(filepath.Join(dir, name+".yaml")); err == nil {
+			if err := yaml.Unmarshal(raw, c); err != nil {
+				return nil, fmt.Errorf("canon: %s.yaml 解析失败: %w", name, err)
+			}
 		}
 	}
 	return c, nil
