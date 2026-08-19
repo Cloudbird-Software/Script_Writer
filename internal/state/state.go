@@ -34,6 +34,7 @@ const (
 	GateQuoteGrounding = "quote-grounding"
 	GateHookPayoff     = "hook-payoff"
 	GateLedgerClose    = "ledger-close"
+	GateHygiene        = "hygiene" // M4 门 2：文本卫生
 )
 
 // Violation 是全工具统一的违规报告单元（issue #1 §三 输出契约）。
