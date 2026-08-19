@@ -9,6 +9,7 @@ import (
 	"github.com/Cloudbird-Software/Script_Writer/internal/rules/gates"
 	"github.com/Cloudbird-Software/Script_Writer/internal/rules/hygiene"
 	"github.com/Cloudbird-Software/Script_Writer/internal/rules/lineownership"
+	"github.com/Cloudbird-Software/Script_Writer/internal/rules/producibility"
 )
 
 // allRules 返回全部门禁（注册表）。新增门禁只改这里与对应 rules 子包——
@@ -28,5 +29,6 @@ func allRules() []rules.Rule {
 		arc.Rule(),           // 门 9：弧线（起点/升速/代价）
 		brand.Rule(),         // 门 10：营销（排期申报/令牌材质漂移）
 		compliance.Rule(),    // 门 11：品牌安全（分级词表 hard/flag）
+		producibility.Rule(), // 门 12：可拍性（角色/场景/上屏/镜头/群演/成本标签）
 	}
 }
