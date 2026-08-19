@@ -1,0 +1,16 @@
+props:
+  - id: KEFANG
+    name: 门房牌
+    tiers: [木, 铜]
+    visual_rule: 以材质与刻痕区分，禁止文字
+    issue_rule: 初访赠木牌，重购升铜
+    return_rule: 进店领、离店交回
+    states: [库存, 持有, 抵押, 注销]
+    transitions:
+      库存: [持有]
+      持有: [抵押, 注销]
+      抵押: [注销, 库存]
+      注销: []
+    instances:
+      - {id: KEFANG_PEIZHAO, tier: 铜, holder: PEI_ZHAO, initial_state: 持有}
+      - {id: KEFANG_WOOD, tier: 木, holder: SHEN_WENZHOU, initial_state: 库存}

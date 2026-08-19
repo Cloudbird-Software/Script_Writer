@@ -1,0 +1,6 @@
+timeline:
+  - {ep: 1, date: 政和三年 八月廿一, day: 1, season: autumn, weather: 晴, time_of_day: 夜}
+  - {ep: 2, date: 政和三年 八月廿二, day: 2, season: autumn, weather: 云, time_of_day: 夜}
+  - {ep: 3, date: 政和三年 八月廿四, day: 4, season: autumn, weather: 晴, time_of_day: 晨}
+  - {ep: 4, date: 政和三年 八月廿五, day: 5, season: autumn, weather: 夜雨, time_of_day: 夜}
+  - {ep: 5, date: 政和三年 八月廿七, day: 7, season: autumn, weather: 晴, time_of_day: 夜}

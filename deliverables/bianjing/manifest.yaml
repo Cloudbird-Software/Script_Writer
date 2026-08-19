@@ -1,0 +1,57 @@
+canon: canon
+episodes:
+  - ep: 1
+    file: episodes/e01.md
+    target_chars: 500
+    delta:
+      meetings: [{a: PEI_ZHAO, b: SHEN_WENZHOU}]
+      hooks_opened:
+        - {loop_id: L_JINHUAN, priority: P0, desc: 柜底前朝金环的来历, pickup_keywords: [金环]}
+      selling_point: 热汤沐浴
+      emotion: 好奇
+      time: {day: 1, season: autumn}
+      new_facts: [裴照首次入住汴京客栈]
+
+  - ep: 2
+    file: episodes/e02.md
+    target_chars: 500
+    delta:
+      hooks_opened:
+        - {loop_id: L_XUNYE, priority: P1, desc: 巡夜官要按规矩盘查住客, pickup_keywords: [巡夜]}
+      line_uses: [{line: SLOGAN_1, count: 1}]
+      selling_point: 代客存物
+      emotion: 心安
+      time: {day: 2, season: autumn}
+
+  - ep: 3
+    file: episodes/e03.md
+    target_chars: 500
+    delta:
+      meetings: [{a: ZHONG_XUNYE, b: SHEN_WENZHOU}]
+      hooks_opened:
+        - {loop_id: L_CHAOJIAN, priority: P1, desc: 皇城司要来查前朝旧账的传言, pickup_keywords: [查账]}
+      selling_point: 夜半送汤
+      emotion: 悬疑
+      time: {day: 4, season: autumn}
+
+  - ep: 4
+    file: episodes/e04.md
+    target_chars: 500
+    delta:
+      hooks_opened:
+        - {loop_id: L_HOUDIAN, priority: P1, desc: 后门那盏从不为客点亮的灯笼, pickup_keywords: [灯笼]}
+      prop_changes: [{instance: KEFANG_PEIZHAO, from: 持有, to: 抵押}]
+      selling_point: 危机关怀
+      emotion: 危机
+      time: {day: 5, season: autumn}
+
+  - ep: 5
+    file: episodes/e05.md
+    target_chars: 500
+    finale: true
+    delta:
+      hooks_closed: [L_JINHUAN, L_XUNYE, L_CHAOJIAN, L_HOUDIAN]
+      line_uses: [{line: SLOGAN_1, count: 1}]
+      selling_point: 热汤沐浴
+      emotion: 送别
+      time: {day: 7, season: autumn}

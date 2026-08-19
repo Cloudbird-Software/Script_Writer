@@ -1,0 +1,8 @@
+lines:
+  - id: SLOGAN_1
+    text: 人在闹市，心在汴梁
+    variants: [人在闹市心有汴梁]
+    owner: SHEN_WENZHOU
+    max_uses_total: 8
+    max_uses_per_ep: 1
+    required_context: 劝客安眠或临别送行时

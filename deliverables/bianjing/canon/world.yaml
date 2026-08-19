@@ -1,0 +1,10 @@
+world:
+  rules:
+    - id: W1
+      rule: 京中入夜宵禁，掌灯后汴京客栈后门必须落闩
+      cost_clause: 若被人发现借道后门，客栈三日不得悬挂灯笼，断客斩誉
+      knows: [SHEN_WENZHOU]
+    - id: W2
+      rule: 柜底那枚前朝金环是旧案赃证，不得示人
+      cost_clause: 若金环被巡夜官查实，掌柜当押入皇城司大狱
+      knows: [SHEN_WENZHOU]

@@ -1,0 +1,12 @@
+selling_points:
+  categories: [facility, service]
+  constraints:
+    max_eps_per_point: 2
+    second_occurrence_new_dimension: true
+    min_service_ratio: 0.4
+  schedule:
+    - {ep: 1, point: 热汤沐浴, category: facility, dimension: 温汤祛寒}
+    - {ep: 2, point: 代客存物, category: service, dimension: 细密周到}
+    - {ep: 3, point: 夜半送汤, category: service, dimension: 抚慰过客}
+    - {ep: 4, point: 危机关怀, category: service, dimension: 一店护一人}
+    - {ep: 5, point: 热汤沐浴, category: facility, dimension: 送客之别}
