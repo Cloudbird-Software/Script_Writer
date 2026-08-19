@@ -58,7 +58,7 @@ func (rule) Check(in rules.Input) []state.Violation {
 			}
 			// 2. 归属：台词所在句恰好一个具名角色 → 必须是 owner。
 			if hitSent >= 0 {
-				if speaker, name := soleCharacter(in.Canon, sents[hitSent]); speaker != "" && speaker != line.Owner {
+				if speaker, name := rules.SoleCharacter(in.Canon, sents[hitSent]); speaker != "" && speaker != line.Owner {
 					owner := ownerName(in.Canon, line.Owner)
 					vs = append(vs, state.Violation{
 						Gate: state.GateLineOwnership, Episode: ep.Ep,
@@ -82,26 +82,6 @@ func countLine(sent string, line canon.Line) int {
 		n += strings.Count(sent, v)
 	}
 	return n
-}
-
-// soleCharacter 返回句子中恰好出现的唯一具名角色（id, 名称）；
-// 零个或多个时返回空（歧义不判）。
-func soleCharacter(c *canon.Canon, sent string) (id, name string) {
-	for _, e := range c.Entities {
-		if e.Type != "character" {
-			continue
-		}
-		for _, n := range append([]string{e.CanonicalName}, e.Aliases...) {
-			if n != "" && strings.Contains(sent, n) {
-				if id != "" {
-					return "", "" // 多个角色，歧义
-				}
-				id, name = e.ID, n
-				break
-			}
-		}
-	}
-	return id, name
 }
 
 func ownerName(c *canon.Canon, id string) string {

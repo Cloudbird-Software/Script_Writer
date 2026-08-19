@@ -11,6 +11,7 @@ import (
 	"github.com/Cloudbird-Software/Script_Writer/internal/rules/lineownership"
 	"github.com/Cloudbird-Software/Script_Writer/internal/rules/novelty"
 	"github.com/Cloudbird-Software/Script_Writer/internal/rules/producibility"
+	"github.com/Cloudbird-Software/Script_Writer/internal/rules/voice"
 )
 
 // allRules 返回全部门禁（注册表）。新增门禁只改这里与对应 rules 子包——
@@ -32,5 +33,6 @@ func allRules() []rules.Rule {
 		compliance.Rule(),    // 门 11：品牌安全（分级词表 hard/flag）
 		producibility.Rule(), // 门 12：可拍性（角色/场景/上屏/镜头/群演/成本标签）
 		novelty.Rule(),       // 门 8：新鲜度（申报下限 + n-gram 重复度）
+		voice.Rule(),         // 软门 13：声音指纹（角色间台词离散度）
 	}
 }
