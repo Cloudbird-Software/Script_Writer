@@ -9,6 +9,7 @@ import (
 	"github.com/Cloudbird-Software/Script_Writer/internal/rules/gates"
 	"github.com/Cloudbird-Software/Script_Writer/internal/rules/hygiene"
 	"github.com/Cloudbird-Software/Script_Writer/internal/rules/lineownership"
+	"github.com/Cloudbird-Software/Script_Writer/internal/rules/novelty"
 	"github.com/Cloudbird-Software/Script_Writer/internal/rules/producibility"
 )
 
@@ -30,5 +31,6 @@ func allRules() []rules.Rule {
 		brand.Rule(),         // 门 10：营销（排期申报/令牌材质漂移）
 		compliance.Rule(),    // 门 11：品牌安全（分级词表 hard/flag）
 		producibility.Rule(), // 门 12：可拍性（角色/场景/上屏/镜头/群演/成本标签）
+		novelty.Rule(),       // 门 8：新鲜度（申报下限 + n-gram 重复度）
 	}
 }
