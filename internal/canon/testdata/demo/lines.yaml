@@ -1,0 +1,8 @@
+lines:
+  - id: SLOGAN_1
+    text: 门里门外，规矩我给您圆上
+    variants: [规矩，我给您圆上]
+    owner: LIU_QINGMEI
+    max_uses_total: 8
+    max_uses_per_ep: 1
+    required_context: 对方正处于两套规则冲突中，主角为其兜住
