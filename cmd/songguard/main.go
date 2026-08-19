@@ -20,8 +20,10 @@ var version = "dev"
 const usage = `songguard %s——小说/短剧跨集一致性校验工具
 
 用法:
-  songguard check [-out <dir>] <manifest.yaml>
+  songguard check [-out <dir>] [-sidecar <url>] <manifest.yaml>
                                            全量校验（canon 结构 + 状态台账 + 门禁 + 全局 pass）
+                                           -sidecar 启用 M5 LLM 软 pass（sweep+reader，
+                                           warn 级建议不阻断；须先启动 sidecar/songguard_sidecar）
   songguard linkage -manifest <m.yaml> -ep <N>
                                            重跑 ±1 集联动校验（E14→E15 类断裂）
   songguard version                        打印版本
@@ -56,14 +58,19 @@ func main() {
 func runCheck(args []string) int {
 	fs := flag.NewFlagSet("check", flag.ExitOnError)
 	outDir := fs.String("out", ".", "报表输出目录")
+	sidecar := fs.String("sidecar", "", "M5 LLM 旁路地址（如 http://127.0.0.1:8710；空=不跑 LLM pass）")
 	if err := fs.Parse(args); err != nil {
 		return 2
 	}
 	if fs.NArg() != 1 {
-		fmt.Fprintf(os.Stderr, "用法: songguard check [-out <dir>] <manifest.yaml>\n")
+		fmt.Fprintf(os.Stderr, "用法: songguard check [-out <dir>] [-sidecar <url>] <manifest.yaml>\n")
 		return 2
 	}
-	g := songguard.New()
+	var opts []songguard.Option
+	if *sidecar != "" {
+		opts = append(opts, songguard.WithSidecar(*sidecar))
+	}
+	g := songguard.New(opts...)
 	rep, err := g.Check(fs.Arg(0))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "songguard: %v\n", err)

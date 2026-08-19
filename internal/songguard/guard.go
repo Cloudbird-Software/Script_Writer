@@ -17,6 +17,7 @@ import (
 	"fmt"
 
 	"github.com/Cloudbird-Software/Script_Writer/internal/engine"
+	"github.com/Cloudbird-Software/Script_Writer/internal/llm"
 )
 
 // Guard 是跨集一致性校验的执行器；零值不可用，须 New 构造。
@@ -33,7 +34,8 @@ func New(opts ...Option) *Guard {
 	return &Guard{opts: o}
 }
 
-// Check 对 manifest 做全量校验：canon 结构 → 状态台账 → 全部门禁 → 全局 pass。
+// Check 对 manifest 做全量校验：canon 结构 → 状态台账 → 全部门禁 → 全局 pass
+// →（可选）M5 LLM 软 pass（WithSidecar 启用，warn 级建议，不阻断交付）。
 func (g *Guard) Check(manifestPath string) (*Report, error) {
 	c, eps, err := engine.LoadManifest(manifestPath)
 	if err != nil {
@@ -43,7 +45,16 @@ func (g *Guard) Check(manifestPath string) (*Report, error) {
 	if err != nil {
 		return nil, err
 	}
+	res.Violations = append(res.Violations, engine.RunLLMPass(g.llmClient(), g.opts.provider, c, eps)...)
 	return &Report{res: res}, nil
+}
+
+// llmClient 构造旁路客户端；未配置 sidecar 时返回 nil（RunLLMPass 对 nil 直接跳过）。
+func (g *Guard) llmClient() *llm.Client {
+	if g.opts.sidecarURL == "" {
+		return nil
+	}
+	return llm.New(g.opts.sidecarURL)
 }
 
 // Linkage 重跑 ±1 集联动校验：被重跑集与其前后集的钩子承接完整性

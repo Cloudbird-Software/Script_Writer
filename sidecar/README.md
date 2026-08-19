@@ -39,6 +39,17 @@ export SONGGUARD_LLM_API_KEY=...                            # 不落仓库
 export SONGGUARD_LLM_MODEL=deepseek-chat
 ```
 
+## Go 侧调用
+
+sidecar 起来后，主工具一行接通（软 pass：warn 级建议，不阻断交付）：
+
+```bash
+songguard check -sidecar http://127.0.0.1:8710 examples/demo/manifest.yaml
+```
+
+对应门面 API：`songguard.New(songguard.WithSidecar(url))`。sidecar 不可用时
+自动降级为单条可见 warn，主流程照常完成。
+
 ## 测试
 
 ```bash
