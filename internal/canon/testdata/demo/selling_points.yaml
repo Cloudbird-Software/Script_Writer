@@ -1,0 +1,12 @@
+selling_points:
+  categories: [facility, service]
+  constraints:
+    max_eps_per_point: 2
+    second_occurrence_new_dimension: true
+    min_service_ratio: 0.4
+  schedule:
+    - {ep: 1, point: 热水淋浴, category: facility, dimension: 设备惊叹}
+    - {ep: 2, point: 个性化响应, category: service, dimension: 解决具体痛点}
+    - {ep: 3, point: 隐私尊重, category: service, dimension: 服务细节}
+    - {ep: 4, point: 危机关怀, category: service, dimension: 一对一关怀}
+    - {ep: 5, point: 热水淋浴, category: facility, dimension: 胜负手}  # 第二次出现换维度

@@ -1,0 +1,40 @@
+entities:
+  - id: LIU_QINGMEI
+    type: character
+    canonical_name: 柳青眉
+    aliases: [柳掌柜, 青眉]
+    forbidden_names: []
+    role_timeline:
+      - {from: 1, to: 30, role: 宋驿掌柜}
+    voice_profile: 低沉、短句、爱擦柜台
+    knows_secret: true
+  - id: CUI_BAI
+    type: character
+    canonical_name: 崔白
+    aliases: [崔公子]
+    forbidden_names: []
+    role_timeline:
+      - {from: 1, to: 30, role: 落魄书生}
+    knows_secret: false
+  - id: NING_BUKUAI
+    type: character
+    canonical_name: 宁捕快
+    aliases: [宁爷]
+    forbidden_names: [渔捕快]   # P0-#2：历史漂移进黑名单
+    role_timeline:
+      - {from: 1, to: 30, role: 水上巡检}
+    knows_secret: false
+  - id: AFU
+    type: character
+    canonical_name: 阿福
+    aliases: [福哥]
+    forbidden_names: [A福, 货郎头]  # P0-#2 / P2：混排与旧称
+    role_timeline:
+      - {from: 2, to: 30, role: 店伙计}
+    knows_secret: false
+  - id: SONGYI
+    type: brand
+    canonical_name: 宋驿
+    aliases: []
+    forbidden_names: [靖康驿站]   # P0-#1：招牌名不一致（且"靖康"是亡国年号）
+    role_timeline: []

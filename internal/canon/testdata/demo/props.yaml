@@ -1,0 +1,16 @@
+props:
+  - id: TOKEN
+    name: 令牌
+    tiers: [木, 铜, 银, 金]
+    visual_rule: 以刻痕道数与材质区分，禁止依赖文字
+    issue_rule: 初访赠木牌；回头客留宿满三名升铜；荣誉客赠金
+    return_rule: 进门领、出门交回（房卡模式，全剧唯一规则）
+    states: [库存, 持有, 抵押, 赎回, 注销]
+    transitions:
+      库存: [持有]
+      持有: [抵押, 注销]
+      抵押: [赎回, 注销]
+      赎回: [持有]
+    instances:
+      - {id: TOKEN_CUIBAI, tier: 铜, holder: CUI_BAI, initial_state: 持有}
+      - {id: TOKEN_WOOD_01, tier: 木, holder: LIU_QINGMEI, initial_state: 库存}
