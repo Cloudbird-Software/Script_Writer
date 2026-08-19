@@ -7,3 +7,19 @@ dist/
 !.env.example
 *.log
 .DS_Store
+
+# Python 历史残留（语言已切 Go，ADR-0001；防止旧产物再次入库）
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/
+.pytest_cache/
+.ruff_cache/
+.hypothesis/
+.diskcache/
+.coverage
+.coverage.*
+
+# Go / 测试产物
+testdata/rapid/
+*.fail
