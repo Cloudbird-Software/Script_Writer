@@ -1,0 +1,15 @@
+# M4 门禁配置（ADR-0002）：阈值与词表随剧目资产化。
+# 未列出的段落走 WithDefaults() 内置默认（默认词表取材 issue #1 已发生缺陷）。
+config:
+  arc:
+    character: LIU_QINGMEI     # 弧线门追踪的主角（须在 entities 中）
+    max_level: 5               # 权限等级轨 0→5
+    min_eps_per_step: 5        # 每 5 集最多 +1
+  hook_payoff:
+    warn_after_eps: 6          # 伏笔悬置 >6 集告警
+    fail_after_eps: 10         # 悬置 >10 集硬失败
+  producibility:
+    max_named_chars_per_ep: 5  # 每集具名角色 ≤5
+    max_new_chars_per_ep: 1    # 每集新角色 ≤1
+    max_scenes_per_ep: 3       # 每集场景 ≤3
+    max_crowd_scenes: 2        # 群演场次全剧配额
