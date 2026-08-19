@@ -16,10 +16,11 @@
 
 ## 索引（用到再读，不要全读）
 
-| 场景                | 读这个                                                                                                                       |
-| ------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| 建模块 / 动模块边界 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)                                                                                 |
-| 选语言 / 选库       | [governance/policy/languages.yaml](https://github.com/Cloudbird-Software/.github/blob/main/governance/policy/languages.yaml) |
-| 写测试 / 上新测试   | [governance/policy/testing.yaml](https://github.com/Cloudbird-Software/.github/blob/main/governance/policy/testing.yaml)     |
-| 治理措施总清单      | [governance/GOVERNANCE.yaml](https://github.com/Cloudbird-Software/.github/blob/main/governance/GOVERNANCE.yaml)             |
-| 模块内工作          | 该模块目录下的 AGENTS.md                                                                                                     |
+| 场景 | 读这个 |
+| --- | --- |
+| 改生成 Pass / 模块边界 / 层级规矩 | [src/AGENTS.md](src/AGENTS.md) + [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
+| 改检查规则 | `spec/checks/DSL.md` → `spec/checks/_schema.yaml` |
+| 改判官 / 评测 | `spec/rubrics/` → [docs/SOP_JUDGE_CALIBRATION.md](docs/SOP_JUDGE_CALIBRATION.md) |
+| 反馈 / 飞轮数据 | [docs/SOP_FEEDBACK_INGEST.md](docs/SOP_FEEDBACK_INGEST.md)（真相 = `cases/export/*.jsonl`） |
+| 决策记录 / 为什么长这样 | [adr/](adr/) |
+| 选语言 / 选库 / 测试政策 | 组织 [governance/policy](https://github.com/Cloudbird-Software/.github/tree/main/governance/policy) |

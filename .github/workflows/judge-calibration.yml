@@ -1,0 +1,45 @@
+name: Judge Calibration (每周)
+on:
+  schedule: [{cron: "0 1 * * 1"}]     # 每周一 09:00 CST
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  actions: write
+
+jobs:
+  calibrate:
+    runs-on: ubuntu-latest
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+    steps:
+      - uses: actions/checkout@3d3f42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          version: "0.12.5"
+      - run: make setup && make db-rebuild
+      - id: cal
+        run: uv run nsc judge calibrate --report out/judge_calibration.md --github-output
+      - name: 未达门槛 → 关闸 + 开 Issue（D8）
+        if: steps.cal.outputs.gate_ok != 'true'
+        run: |
+          gh variable set JUDGE_GATE_ENABLED --body "false"
+          gh issue create \
+            --title "判官校准未达门槛（$(date +%F)）：判官门禁已自动关闭" \
+            --label "judge,blocked" \
+            --body-file out/judge_calibration.md
+        env: {GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"}
+      - name: 达标 → 开闸
+        if: steps.cal.outputs.gate_ok == 'true'
+        run: gh variable set JUDGE_GATE_ENABLED --body "true"
+        env: {GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"}
+      # BP-1：main 仅经 PR 进入；校准报告归档为 artifact（不再直推 git）
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: always()
+        with:
+          name: judge-calibration
+          path: out/judge_calibration.md
+          if-no-files-found: ignore
