@@ -1,0 +1,23 @@
+{
+  "$comment": "Go(internal/llm) 与 Python(sidecar) 共享的 mock 契约期望：两侧测试都断言这份文件，保证对 /v1/llm-check 协议的理解一致。",
+  "sweep": {
+    "findings": [
+      {
+        "episode": 11,
+        "position": "第1句",
+        "issue": "『宁捕快……他是渔捕快』同句出现两个名字，registry 中 canonical_name 为宁捕快",
+        "suggestion": "改为『宁捕快……他管水上勾当』",
+        "confidence": "high"
+      }
+    ]
+  },
+  "reader": {
+    "hooks": [
+      {"episode": 4, "strength": "weak", "reason": "暖收：客人道谢离店，无新悬念"},
+      {"episode": 7, "strength": "medium", "reason": "柳青眉立下规矩，冲突半开"}
+    ],
+    "drop_off_prediction": "第8集前后：『客人被热水震惊』第4次出现，观众耐受耗尽",
+    "token_rule_restate": "正文里令牌规则前后不一：E2 是满三名回头客赠牌，E12 变成抵押赎回，E30 变成进门领、出门交",
+    "token_rule_consistent": false
+  }
+}
