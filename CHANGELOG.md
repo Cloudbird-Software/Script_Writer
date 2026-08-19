@@ -5,6 +5,9 @@
 ## [Unreleased]
 
 ### Added
+- M4 新鲜度门 `novelty`（门 8，规则版）：每集必须申报 ≥1 new_fact 与
+  ≥1 state_change（没有新事实的一集是复述集）+ 与前 N 集字符 4-gram 重复度
+  > max_repeat_ratio 硬失败（拦 E19/E21/E29 三集复述；embedding 深查属 M5）。
 - M4 可拍性门 `producibility`（门 12）：每集具名角色/新角色/场景上限、
   剧情关键汉字上屏硬失败（必须转图案/符号/后期贴字）、镜头语言禁入散文、
   群演全剧配额、夜景/水汽/儿童/动物成本标签（warn 进风险清单）。
