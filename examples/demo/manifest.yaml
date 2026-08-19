@@ -1,0 +1,56 @@
+canon: canon
+episodes:
+  - ep: 1
+    file: episodes/e01.md
+    target_chars: 500
+    delta:
+      meetings: [{a: CUI_BAI, b: LIU_QINGMEI}]
+      hooks_opened:
+        - {loop_id: L_MUPAI, priority: P0, desc: 柜上那枚木牌的来历, pickup_keywords: [木牌]}
+      selling_point: 热水淋浴
+      emotion: 惊叹
+      time: {day: 1, season: spring}
+      new_facts: [崔白首次住店]
+
+  - ep: 2
+    file: episodes/e02.md
+    target_chars: 500
+    delta:
+      hooks_opened:
+        - {loop_id: L_GUANCHAI, priority: P1, desc: 城里要来官差查账的传闻, pickup_keywords: [官差]}
+      line_uses: [{line: SLOGAN_1, count: 1}]
+      selling_point: 个性化响应
+      emotion: 温暖
+      time: {day: 2, season: spring}
+
+  - ep: 3
+    file: episodes/e03.md
+    target_chars: 500
+    delta:
+      meetings: [{a: NING_BUKUAI, b: LIU_QINGMEI}]
+      hooks_opened:
+        - {loop_id: L_DENG, priority: P1, desc: 大堂彻夜不熄的灯, pickup_keywords: [灯]}
+      selling_point: 隐私尊重
+      emotion: 悬疑
+      time: {day: 5, season: spring}
+
+  - ep: 4
+    file: episodes/e04.md
+    target_chars: 500
+    delta:
+      hooks_opened:
+        - {loop_id: L_FANGQI, priority: P1, desc: 柜台里那份旧房契, pickup_keywords: [房契]}
+      prop_changes: [{instance: TOKEN_CUIBAI, from: 持有, to: 抵押}]
+      selling_point: 危机关怀
+      emotion: 危机
+      time: {day: 6, season: spring}
+
+  - ep: 5
+    file: episodes/e05.md
+    target_chars: 500
+    finale: true
+    delta:
+      hooks_closed: [L_MUPAI, L_GUANCHAI, L_DENG, L_FANGQI]
+      selling_point: 热水淋浴
+      emotion: 打脸
+      time: {day: 7, season: spring}

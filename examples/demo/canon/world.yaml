@@ -1,0 +1,10 @@
+world:
+  rules:
+    - id: W1
+      rule: 门是连接现代与宋朝的通道，仅柳青眉可开
+      cost_clause: 若门外势力查实门内之事，门即关闭，柳青眉将永远留在其中一侧
+      knows: [LIU_QINGMEI]
+    - id: W2
+      rule: 门内物品不得出门，出门即失灵
+      cost_clause: 违者门禁七天不开，店内断供
+      knows: [LIU_QINGMEI, CUI_BAI]

@@ -17,17 +17,22 @@
 
 | 层 | 内容 | 状态 |
 | --- | --- | --- |
-| M1 状态内核 | 六张 canon 表 schema + delta 协议 + apply + 伏笔/相遇/道具台账 + 时间轴 | 开发中 |
-| M2 五道硬门 | 一致性 / 关系 / 引文接地 / 钩子回收 / 格式（纯函数，零 LLM） | 开发中 |
-| M3 全局 pass | Ledger Close 结算 + Consistency Sweep（只出 diff 建议）+ ±1 集联动校验 | 开发中 |
+| M1 状态内核 | 六张 canon 表 schema + delta 协议 + apply + 伏笔/相遇/道具台账 + 时间轴 | 已交付 |
+| M2 五道硬门 | 一致性 / 关系 / 引文接地 / 钩子回收 / 格式（纯函数，零 LLM） | 已交付 |
+| M3 全局 pass | Ledger Close 结算 + Consistency Sweep（只出 diff 建议）+ ±1 集联动校验 | 已交付 |
 | M4/M5 | 域门禁纯规则版 / LLM 软能力（届时按 llm_prompt 层政策独立成 python+baml 旁路仓） | 后置 |
 
 ## 快速开始
 
 ```bash
-make setup                                # go mod download
-make check                                # gofmt + go vet + 边界检查 + go test -race
-go run ./cmd/songguard check manifest.yaml # M3 交付
+make setup                # go mod download
+make check                # gofmt + go vet + 边界检查 + go test -race
+
+# 全量校验（stdout 摘要 JSON；-out 目录产出 deliverable.md / sweep.md / violations.json）
+go run ./cmd/songguard check -out /tmp/sg examples/demo/manifest.yaml
+
+# 重跑 ±1 集联动校验（拦 E14→E15 类钩子断裂）
+go run ./cmd/songguard linkage -manifest examples/demo/manifest.yaml -ep 4
 ```
 
 ## Makefile 接口（所有语言统一，CI 只认这个）
@@ -59,6 +64,7 @@ internal/canon/    M1: 六张 canon 表的类型 + 加载 + 结构校验
 internal/state/    M1: delta 协议 + apply + 伏笔/相遇/道具台账 + 时间轴
 internal/gates/    M2: 五道硬门（纯函数）
 internal/passes/   M3: Ledger Close + Sweep 规则版 + ±1 集联动校验
+examples/demo/     可跑通的干净样例（5 集 canon + 正文 + delta 申报）
 ```
 
 架构纪律见 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)；开发规矩见 [AGENTS.md](AGENTS.md)。

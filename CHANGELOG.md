@@ -8,6 +8,12 @@
 - 初始模板工程（CI gate / hygiene / dependabot / automerge 全套护栏）。
 - songguard 项目起架：Go 1.25 模块、`cmd/songguard` CLI 骨架、Makefile Go 工具链
   （lint=gofmt+go vet、arch=GO-3 边界检查、test=-race）、ADR-0001（语言切换与分期）。
+- M1 状态内核（PR #5/#6）：六张 canon 表 schema/加载/结构校验（internal/canon）+ delta 协议/apply 引擎/伏笔·相遇·道具三本台账与时间轴（internal/state，PBT：closed⊆opened、apply 单调性）。
+- M2 五道硬门（PR #7，internal/gates）：格式 / 一致性 / 关系 / 引文接地 / 钩子回收，全部带 issue #1 实际缺陷复现用例（E5"渔捕快"、E9"A福"、E12 二次相识、E30 检索失败、E21 字数）与 PBT。
+- M3 全局 pass + CLI（internal/passes + cmd/songguard）：
+  `songguard check [-out <dir>] <manifest.yaml>`（stdout 摘要 JSON + deliverable.md 交付五件套 + sweep.md 巡检建议 + violations.json）、
+  `songguard linkage -manifest <m> -ep <N>`（重跑 ±1 集联动校验，拦 E14→E15 类断裂）；
+  examples/demo 提供可跑通的干净样例（5 集）。
 
 ### Changed
 - **语言切换 Python→Go**（ADR-0001，issue #1 批准）：仓库重定位为 songguard
