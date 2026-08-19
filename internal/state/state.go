@@ -37,6 +37,7 @@ const (
 	GateHygiene        = "hygiene"       // M4 门 2：文本卫生
 	GateLineOwnership  = "lineownership" // M4 门 6：台词归属
 	GateEmotion        = "emotion"       // M4 软门 14：情绪曲线
+	GateArc            = "arc"           // M4 门 9：弧线
 )
 
 // Violation 是全工具统一的违规报告单元（issue #1 §三 输出契约）。
