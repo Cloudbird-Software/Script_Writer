@@ -1,39 +1,42 @@
-# 架构纪律（每个模块都必须遵守）
+# 架构纪律（每个包都必须遵守）
 
-> 新建模块、动模块边界、review 时读。开发循环的硬约束见 [src/AGENTS.md](../src/AGENTS.md)。
+> 新建包、动包边界、review 时读。组织政策：`governance/policy/languages.yaml`（application 层 = go）。
 
-## 分层
+## 分层与依赖方向（只允许单向）
 
 ```
-spec/（资产 A：ir / checks / rubrics / rules / passes 契约）   ← 唯一真相，改它要 ADR
-src/nsc/（代码 B2：runtime·checker·passes·judge·optimize …）   ← 可丢弃，测试全绿即可重写
-cases/export/*.jsonl（资产 A：飞轮数据真相）→ cases.db（B3 工作副本，gitignored）
-out/（B3 生成物，gitignored）
+cmd/songguard ──▶ internal/passes ──▶ internal/gates ──▶ internal/state ──▶ internal/canon
+      │                                                                              ▲
+      └──────────────────────────────────────────────────────────────────────────────┘
+（cmd 可读任意 internal 包；internal 包只能向左依赖，禁止反向/循环。`make arch` 执法。）
 ```
 
-## 模块纪律
+- **internal/canon**（M1）：六张 canon 表（Entity Registry / Prop Bible / World Rules /
+  Line Assets / 卖点排期 / Timeline）的 Go 类型、YAML 加载与结构校验。
+  不可变数据定义，不依赖任何其它 internal 包。
+- **internal/state**（M1）：delta 协议（meetings / hooks / prop_changes / line_uses /
+  selling_point / emotion / time / new_facts / state_changes）+ apply + 三本台账
+  （伏笔 open-loop、相遇、道具 instance）+ 时间轴。纯函数，无 IO。
+- **internal/gates**（M2）：五道硬门——一致性 / 关系 / 引文接地 / 钩子回收 / 格式。
+  输入 canon + 台账 + 正文，输出 `[]Violation`。纯函数，零 LLM。
+- **internal/passes**（M3）：Ledger Close（交付五件套报表）、Consistency Sweep 规则版
+  （**只输出 diff 建议、不许重写全文**）、±1 集联动校验。
 
-1. **编译 Pass 的 public entry 是 `spec/passes/signatures.py` 的签名契约**；Pass 间依赖必须与
-   `spec/passes/dep_graph.yaml` 一致。跨模块不得绕过契约直接 import 内部函数。
-2. **`src/nsc/guards/` 是本仓的架构边界 lint（`make arch`）**：D2 归约、规则 schema、
-   prompts 未手改、IR breaking change、行数预算（`spec/BUDGETS.yaml`）、规则冲突、
-   db↔jsonl 一致。对应组织模板的 depcruise 位。
-3. **模块大小上限 3000 行**（`spec/BUDGETS.yaml` 按 D21 预算执法）。超过就拆——
-   一个模块必须能被 agent 一次性完整读完。
-4. **生成代码独立目录，禁手改**（`out/`、渲染产物；`prompts/` 只能由 `nsc optimize` 写入）。
-5. **接口设计标准**：一个 LLM 能否仅凭函数签名 + 一行 docstring 就零样本正确使用？
-   答案是否 => 接口太浅，重做。
-6. **测试优先级**：行为不变量用 property-based test（pytest + hypothesis），
-   关键输出用 golden test（syrupy 快照 + `tests/fixtures/golden/`）。
-   先写不变量，再写实现。每条 check 规则必须带 `pass.json` / `fail.json` fixture。
+## 包纪律
 
-## 依赖规则
-
-新增依赖前先列出"依赖名 / 用途 / 许可证 / 是否能用标准库替代"等人确认；
-禁止引入 AGPL / GPL-3.0 / SSPL 的库（组织 `policy/languages.yaml`）。
-LLM 调用一律经 `src/nsc/runtime/models.py` 路由（模型 alias 声明在 `config/models.yaml`）。
+1. **GO-3**：入口只在 `cmd/`，`package main` 不得出现在 internal/；internal 不得 import cmd。
+2. **对外行为契约** = 各包导出函数签名 + 包注释；跨包禁止深挖内部实现。
+3. **包 ≤3000 行**（组织 MOD-3）。超限就拆——一个包必须能被 agent 一次性完整读完。
+4. **接口设计标准（IF-1）**：一个 LLM 能否仅凭函数签名 + 一行注释零样本正确使用？否 => 重做。
+5. **测试纪律**：
+   - 每道门禁必须带 issue #1 实际缺陷的**复现用例**（E5 渔捕快、E9 A福、E3 靖康驿站、
+     E12 二次相识、E30 过客有期、E14→E15 钩子断裂、E21 字数）。
+   - 行为不变量用 PBT（`flyingmutant/rapid`）：apply 台账守恒（closed ⊆ opened）、
+     时间轴单调、合法序列零违规。
+   - bug 修复先写复现失败测试（AGENTS.md 规则 5）。
 
 ## 数据规则
 
-- 唯一数据库 = SQLite + sqlite-vec；持久形态 = `cases/export/*.jsonl`（ADR-0006）。
-- 禁止重 ORM（组织 `policy/languages.yaml` data 层）。
+- canon 表与 delta 申报是**唯一事实来源**；正文文件只读，任何 pass 不得改写正文
+  （Sweep 只输出 diff 建议）。
+- 六张表 YAML schema 变更 = 资产层变更：打 `asset-change` 标签 + 附 ADR。
