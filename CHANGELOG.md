@@ -5,6 +5,13 @@
 ## [Unreleased]
 
 ### Added
+- M5 LLM 软 pass 接线（ADR-0003 收尾）：门面 `songguard.WithSidecar(url)`
+  （可选 `WithProvider`）启用规则门禁之后的语义兜底——sweep 巡检 + reader 观众
+  模拟结论以 warn 级违规进入报告（风险清单与人审），永不阻断交付；
+  CLI `songguard check -sidecar <url>`。sidecar 不可用时降级为单条可见 warn，
+  主流程不受影响；未配置时完全不发请求（CI 无 Python 依赖）。Go 侧
+  `internal/llm` 为 sidecar 唯一对端（标准库 net/http，零新依赖），
+  与 Python 侧共同断言 `fixtures/llm_contract.json` 契约。
 - M5 LLM 旁路 sidecar（ADR-0003）：`sidecar/` Python 进程，BAML 封装 prompt
   （`baml_src/*.baml` = prompt SSOT，git 即版本管理）+ 唯一 HTTP 端点
   `POST /v1/llm-check`（Pass 1 一致性巡检 sweep / Pass 3 观众模拟 reader）。
