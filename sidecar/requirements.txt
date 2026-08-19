@@ -1,0 +1,4 @@
+# songguard sidecar 依赖（刻意最小化；HTTP 服务用 Python 标准库，不引 web 框架）。
+# 许可证：baml-py 与 pydantic 均为 MIT。
+baml-py==0.226.1
+pydantic>=2.0

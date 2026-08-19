@@ -29,6 +29,10 @@ cmd/songguard ─▶ internal/songguard ─▶ internal/engine ─▶ internal/r
 - **internal/state（M1）**：delta 协议（meetings / hooks / prop_changes / line_uses /
   selling_point / emotion / time / new_facts / state_changes / arc / scenes）+ apply +
   三本台账（伏笔 open-loop、相遇、道具 instance）+ 时间轴。纯函数，无 IO。
+- **sidecar/（M5，Python 进程）**：LLM 旁路。BAML（`baml_src/*.baml`）封装 prompt
+  ——prompt 是 harness 资产，git 即版本管理；对外唯一 HTTP 端点 `POST /v1/llm-check`
+  （深接口的进程间形态），Go 侧经 `internal/llm` 客户端调用。LLM 结论一律建议级，
+  阻断决策留在 Go 规则门禁（ADR-0003）。
 
 ## 包纪律
 
