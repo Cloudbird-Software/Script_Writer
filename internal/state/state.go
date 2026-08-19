@@ -42,6 +42,7 @@ const (
 	GateCompliance     = "compliance"    // M4 门 11：品牌安全
 	GateProducibility  = "producibility" // M4 门 12：可拍性
 	GateNovelty        = "novelty"       // M4 门 8：新鲜度
+	GateVoice          = "voice"         // M4 软门 13：声音指纹
 )
 
 // Violation 是全工具统一的违规报告单元（issue #1 §三 输出契约）。

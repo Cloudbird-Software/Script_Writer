@@ -5,6 +5,10 @@
 ## [Unreleased]
 
 ### Added
+- M4 声音指纹门 `voice`（软门 13，规则版）：引号台词按规则版归属（说话语境中
+  唯一具名角色）分桶，各角色平均台词长度的标准差 < min_profile_spread 即 warn
+  （"所有人说话一个味儿"；文白比/口头禅深查与代词消解属 M5 LLM 旁路）。
+  台词归属门与声音指纹门共用 `rules.SoleCharacter` 归属判定（消除重复实现）。
 - M4 新鲜度门 `novelty`（门 8，规则版）：每集必须申报 ≥1 new_fact 与
   ≥1 state_change（没有新事实的一集是复述集）+ 与前 N 集字符 4-gram 重复度
   > max_repeat_ratio 硬失败（拦 E19/E21/E29 三集复述；embedding 深查属 M5）。
