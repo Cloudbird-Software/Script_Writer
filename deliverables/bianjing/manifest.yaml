@@ -6,52 +6,287 @@ episodes:
     delta:
       meetings: [{a: PEI_ZHAO, b: SHEN_WENZHOU}]
       hooks_opened:
-        - {loop_id: L_JINHUAN, priority: P0, desc: 柜底前朝金环的来历, pickup_keywords: [金环]}
+        - {loop_id: H01, priority: P0, desc: 柜底前朝金环的来历, pickup_keywords: [金环]}
       selling_point: 热汤沐浴
       emotion: 好奇
       time: {day: 1, season: autumn}
-      new_facts: [裴照首次入住汴京客栈]
-
   - ep: 2
     file: episodes/e02.md
     target_chars: 500
     delta:
       hooks_opened:
-        - {loop_id: L_XUNYE, priority: P1, desc: 巡夜官要按规矩盘查住客, pickup_keywords: [巡夜]}
+        - {loop_id: H02, priority: P1, desc: 代客存物的书箱里装了何人的秘密, pickup_keywords: [书箱]}
       line_uses: [{line: SLOGAN_1, count: 1}]
       selling_point: 代客存物
       emotion: 心安
       time: {day: 2, season: autumn}
-
   - ep: 3
     file: episodes/e03.md
     target_chars: 500
     delta:
       meetings: [{a: ZHONG_XUNYE, b: SHEN_WENZHOU}]
       hooks_opened:
-        - {loop_id: L_CHAOJIAN, priority: P1, desc: 皇城司要来查前朝旧账的传言, pickup_keywords: [查账]}
+        - {loop_id: H03, priority: P1, desc: 新派巡夜盘查住客的规矩, pickup_keywords: [巡夜]}
       selling_point: 夜半送汤
       emotion: 悬疑
-      time: {day: 4, season: autumn}
-
+      time: {day: 3, season: autumn}
   - ep: 4
     file: episodes/e04.md
     target_chars: 500
     delta:
       hooks_opened:
-        - {loop_id: L_HOUDIAN, priority: P1, desc: 后门那盏从不为客点亮的灯笼, pickup_keywords: [灯笼]}
+        - {loop_id: H04, priority: P1, desc: 铜牌抵押后引来的旧账, pickup_keywords: [铜牌]}
       prop_changes: [{instance: KEFANG_PEIZHAO, from: 持有, to: 抵押}]
       selling_point: 危机关怀
-      emotion: 危机
-      time: {day: 5, season: autumn}
-
+      emotion: 危急
+      time: {day: 4, season: autumn}
   - ep: 5
     file: episodes/e05.md
     target_chars: 500
+    delta:
+      meetings: [{a: YANNIAN, b: SHEN_WENZHOU}]
+      hooks_opened:
+        - {loop_id: H05, priority: P1, desc: 燕娘夜里唱的那首旧曲, pickup_keywords: [燕娘]}
+      selling_point: 热汤沐浴
+      emotion: 温暖
+      time: {day: 5, season: autumn}
+  - ep: 6
+    file: episodes/e06.md
+    target_chars: 500
+    delta:
+      hooks_opened:
+        - {loop_id: H06, priority: P1, desc: 井水的旧名字与老泉眼, pickup_keywords: [井水]}
+      hooks_closed: [H01, H02, H03, H04, H05, H06]
+      selling_point: 井水甘泉
+      emotion: 释然
+      time: {day: 6, season: autumn}
+  - ep: 7
+    file: episodes/e07.md
+    target_chars: 500
+    delta:
+      hooks_opened:
+        - {loop_id: H07, priority: P1, desc: 托信捎话那封没有收信人的信, pickup_keywords: [书信]}
+      line_uses: [{line: SLOGAN_1, count: 1}]
+      selling_point: 托信捎话
+      emotion: 温情
+      time: {day: 7, season: autumn}
+  - ep: 8
+    file: episodes/e08.md
+    target_chars: 500
+    delta:
+      hooks_opened:
+        - {loop_id: H08, priority: P1, desc: 窗外汴河那条夜行的旧船, pickup_keywords: [汴河]}
+      selling_point: 当窗汴河景
+      emotion: 记挂
+      time: {day: 8, season: autumn}
+  - ep: 9
+    file: episodes/e09.md
+    target_chars: 500
+    delta:
+      meetings: [{a: YANNIAN, b: PEI_ZHAO}]
+      hooks_opened:
+        - {loop_id: H09, priority: P1, desc: 请来的那位老大夫认得金环上的刻花, pickup_keywords: [大夫]}
+      selling_point: 出诊请医
+      emotion: 感激
+      time: {day: 9, season: autumn}
+  - ep: 10
+    file: episodes/e10.md
+    target_chars: 500
+    delta:
+      hooks_opened:
+        - {loop_id: H10, priority: P1, desc: 常明廊灯为何整夜不灭, pickup_keywords: [廊灯]}
+      prop_changes: [{instance: KEFANG_YANNIAN, from: 持有, to: 抵押}]
+      selling_point: 常明廊灯
+      emotion: 安稳
+      time: {day: 10, season: autumn}
+  - ep: 11
+    file: episodes/e11.md
+    target_chars: 500
+    delta:
+      hooks_opened:
+        - {loop_id: H11, priority: P1, desc: 那匹寄养的马主人是谁, pickup_keywords: [马]}
+      selling_point: 代客管马
+      emotion: 紧张
+      time: {day: 11, season: autumn}
+  - ep: 12
+    file: episodes/e12.md
+    target_chars: 500
+    delta:
+      hooks_opened:
+        - {loop_id: H12, priority: P1, desc: 寻人时手里那卷古谱, pickup_keywords: [古谱]}
+      hooks_closed: [H07, H08, H09, H10, H11, H12]
+      selling_point: 查名引路
+      emotion: 惊疑
+      time: {day: 12, season: autumn}
+  - ep: 13
+    file: episodes/e13.md
+    target_chars: 500
+    delta:
+      meetings: [{a: YANNIAN, b: ZHONG_XUNYE}]
+      hooks_opened:
+        - {loop_id: H13, priority: P1, desc: 记挂佳客的名册末页有人划掉一行, pickup_keywords: [名册]}
+      selling_point: 记挂佳客
+      emotion: 心事
+      time: {day: 13, season: autumn}
+  - ep: 14
+    file: episodes/e14.md
+    target_chars: 500
+    delta:
+      hooks_opened:
+        - {loop_id: H14, priority: P1, desc: 火柜暖炕里裹着的那方旧帕, pickup_keywords: [火柜]}
+      line_uses: [{line: SLOGAN_1, count: 1}]
+      selling_point: 火柜暖炕
+      emotion: 慰藉
+      time: {day: 14, season: autumn}
+  - ep: 15
+    file: episodes/e15.md
+    target_chars: 500
+    delta:
+      hooks_opened:
+        - {loop_id: H15, priority: P1, desc: 风雪夜后门外那声急梆, pickup_keywords: [风雪]}
+      selling_point: 细问起居
+      emotion: 危急
+      time: {day: 15, season: autumn}
+  - ep: 16
+    file: episodes/e16.md
+    target_chars: 500
+    delta:
+      hooks_opened:
+        - {loop_id: H16, priority: P1, desc: 掌柜对燕娘唱过的半句暗号, pickup_keywords: [暗号]}
+      selling_point: 井水甘泉
+      emotion: 怅惘
+      time: {day: 16, season: autumn}
+  - ep: 17
+    file: episodes/e17.md
+    target_chars: 500
+    delta:
+      hooks_opened:
+        - {loop_id: H17, priority: P1, desc: 病中那碗药汤是给谁熬的, pickup_keywords: [药汤]}
+      selling_point: 夜半送汤
+      emotion: 担忧
+      time: {day: 17, season: autumn}
+  - ep: 18
+    file: episodes/e18.md
+    target_chars: 500
+    delta:
+      hooks_opened:
+        - {loop_id: H18, priority: P1, desc: 灯市里被人替点的那盏河灯, pickup_keywords: [灯市]}
+      hooks_closed: [H13, H14, H15, H16, H17, H18]
+      prop_changes: [{instance: KEFANG_YANNIAN, from: 抵押, to: 库存}]
+      selling_point: 当窗汴河景
+      emotion: 震动
+      time: {day: 18, season: autumn}
+  - ep: 19
+    file: episodes/e19.md
+    target_chars: 500
+    delta:
+      hooks_opened:
+        - {loop_id: H19, priority: P1, desc: 托付旧诺代传的那句遗言, pickup_keywords: [旧诺]}
+      selling_point: 托信捎话
+      emotion: 决断
+      time: {day: 19, season: autumn}
+  - ep: 20
+    file: episodes/e20.md
+    target_chars: 500
+    delta:
+      meetings: [{a: PEI_ZHAO, b: ZHONG_XUNYE}]
+      hooks_opened:
+        - {loop_id: H20, priority: P1, desc: 托付重物的那封密信提到金环来处, pickup_keywords: [密信]}
+      prop_changes: [{instance: KEFANG_PEIZHAO, from: 抵押, to: 库存}]
+      selling_point: 代客存物
+      emotion: 欣慰
+      time: {day: 20, season: autumn}
+  - ep: 21
+    file: episodes/e21.md
+    target_chars: 500
+    delta:
+      hooks_opened:
+        - {loop_id: H21, priority: P1, desc: 廊灯下那则灯谜的答案, pickup_keywords: [灯谜]}
+      line_uses: [{line: SLOGAN_1, count: 1}]
+      selling_point: 常明廊灯
+      emotion: 释然
+      time: {day: 21, season: autumn}
+  - ep: 22
+    file: episodes/e22.md
+    target_chars: 500
+    delta:
+      hooks_opened:
+        - {loop_id: H22, priority: P1, desc: 分利让客那笔无头旧债, pickup_keywords: [旧债]}
+      selling_point: 分利让客
+      emotion: 感慨
+      time: {day: 22, season: autumn}
+  - ep: 23
+    file: episodes/e23.md
+    target_chars: 500
+    delta:
+      hooks_opened:
+        - {loop_id: H23, priority: P1, desc: 夜半备马的人要去哪里, pickup_keywords: [备马]}
+      selling_point: 代客管马
+      emotion: 决绝
+      time: {day: 23, season: autumn}
+  - ep: 24
+    file: episodes/e24.md
+    target_chars: 500
+    delta:
+      hooks_opened:
+        - {loop_id: H24, priority: P1, desc: 寻人引灯那卷古谱烧剩的残页, pickup_keywords: [残页]}
+      hooks_closed: [H19, H20, H21, H22, H23, H24]
+      selling_point: 查名引路
+      emotion: 惊变
+      time: {day: 24, season: autumn}
+  - ep: 25
+    file: episodes/e25.md
+    target_chars: 500
+    delta:
+      hooks_opened:
+        - {loop_id: H25, priority: P1, desc: 千里惦名那封迟迟不来的家书, pickup_keywords: [家书]}
+      selling_point: 记挂佳客
+      emotion: 期盼
+      time: {day: 25, season: autumn}
+  - ep: 26
+    file: episodes/e26.md
+    target_chars: 500
+    delta:
+      hooks_opened:
+        - {loop_id: H26, priority: P1, desc: 雪夜添炭迎来的那位故人, pickup_keywords: [故人]}
+      selling_point: 火柜暖炕
+      emotion: 感伤
+      time: {day: 26, season: autumn}
+  - ep: 27
+    file: episodes/e27.md
+    target_chars: 500
+    delta:
+      hooks_opened:
+        - {loop_id: H27, priority: P1, desc: 细问起居的那位贵人身份, pickup_keywords: [贵人]}
+      line_uses: [{line: SLOGAN_1, count: 1}]
+      selling_point: 细问起居
+      emotion: 感激
+      time: {day: 27, season: autumn}
+  - ep: 28
+    file: episodes/e28.md
+    target_chars: 500
+    delta:
+      hooks_opened:
+        - {loop_id: H28, priority: P1, desc: 请医问凶那夜的不祥之兆, pickup_keywords: [凶兆]}
+      selling_point: 出诊请医
+      emotion: 惊魂
+      time: {day: 28, season: autumn}
+  - ep: 29
+    file: episodes/e29.md
+    target_chars: 500
+    delta:
+      hooks_opened:
+        - {loop_id: H29, priority: P0, desc: 恩义两全的最终决断, pickup_keywords: [恩义]}
+      hooks_closed: [H25, H26, H27, H28]
+      selling_point: 分利让客
+      emotion: 决断
+      time: {day: 29, season: autumn}
+  - ep: 30
+    file: episodes/e30.md
+    target_chars: 500
     finale: true
     delta:
-      hooks_closed: [L_JINHUAN, L_XUNYE, L_CHAOJIAN, L_HOUDIAN]
-      line_uses: [{line: SLOGAN_1, count: 1}]
-      selling_point: 热汤沐浴
-      emotion: 送别
-      time: {day: 7, season: autumn}
+      hooks_closed: [H29]
+      selling_point: 危机关怀
+      emotion: 释然
+      time: {day: 30, season: autumn}

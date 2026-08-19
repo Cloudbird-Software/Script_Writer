@@ -5,7 +5,7 @@ entities:
     aliases: [沈掌柜, 问舟]
     forbidden_names: []
     role_timeline:
-      - {from: 1, to: 5, role: 汴京客栈掌柜}
+      - {from: 1, to: 30, role: 汴京客栈掌柜}
     voice_profile: 疏淡、账房先生口吻、爱呷老茶
     knows_secret: true
   - id: PEI_ZHAO
@@ -14,7 +14,7 @@ entities:
     aliases: [裴公子, 照哥]
     forbidden_names: []
     role_timeline:
-      - {from: 1, to: 5, role: 赶考书生}
+      - {from: 1, to: 30, role: 赶考书生}
     knows_secret: false
   - id: ZHONG_XUNYE
     type: character
@@ -22,7 +22,7 @@ entities:
     aliases: [钟爷]
     forbidden_names: [钟捕快]
     role_timeline:
-      - {from: 3, to: 5, role: 皇城巡夜官}
+      - {from: 3, to: 30, role: 皇城巡夜官}
     knows_secret: false
   - id: AZHU
     type: character
@@ -30,7 +30,15 @@ entities:
     aliases: [竹哥]
     forbidden_names: []
     role_timeline:
-      - {from: 1, to: 5, role: 店小二}
+      - {from: 1, to: 30, role: 店小二}
+    knows_secret: false
+  - id: YANNIAN
+    type: character
+    canonical_name: 燕娘
+    aliases: [燕娘子, 燕姑娘]
+    forbidden_names: [燕娘儿]
+    role_timeline:
+      - {from: 5, to: 30, role: 夜市歌女}
     knows_secret: false
   - id: BIANJING_KEZHAN
     type: place

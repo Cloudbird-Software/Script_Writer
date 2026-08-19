@@ -10,3 +10,28 @@ selling_points:
     - {ep: 3, point: 夜半送汤, category: service, dimension: 抚慰过客}
     - {ep: 4, point: 危机关怀, category: service, dimension: 一店护一人}
     - {ep: 5, point: 热汤沐浴, category: facility, dimension: 送客之别}
+    - {ep: 6, point: 井水甘泉, category: facility, dimension: 汲泉烹茶}
+    - {ep: 7, point: 托信捎话, category: service, dimension: 书信传情}
+    - {ep: 8, point: 当窗汴河景, category: facility, dimension: 枕河听橹}
+    - {ep: 9, point: 出诊请医, category: service, dimension: 请医代付}
+    - {ep: 10, point: 常明廊灯, category: facility, dimension: 夜归亮灯}
+    - {ep: 11, point: 代客管马, category: service, dimension: 喂草备鞍}
+    - {ep: 12, point: 查名引路, category: service, dimension: 汴京问路}
+    - {ep: 13, point: 记挂佳客, category: service, dimension: 客情常记}
+    - {ep: 14, point: 火柜暖炕, category: facility, dimension: 炭火祛寒}
+    - {ep: 15, point: 细问起居, category: service, dimension: 知冷暖寒}
+    - {ep: 16, point: 井水甘泉, category: facility, dimension: 冬饮暖茶}
+    - {ep: 17, point: 夜半送汤, category: service, dimension: 病中送药}
+    - {ep: 18, point: 当窗汴河景, category: facility, dimension: 月下观灯}
+    - {ep: 19, point: 托信捎话, category: service, dimension: 旧诺代传}
+    - {ep: 20, point: 代客存物, category: service, dimension: 托付重物}
+    - {ep: 21, point: 常明廊灯, category: facility, dimension: 元宵点灯}
+    - {ep: 22, point: 分利让客, category: service, dimension: 让利还账}
+    - {ep: 23, point: 代客管马, category: service, dimension: 夜半备马}
+    - {ep: 24, point: 查名引路, category: service, dimension: 寻人引灯}
+    - {ep: 25, point: 记挂佳客, category: service, dimension: 千里惦名}
+    - {ep: 26, point: 火柜暖炕, category: facility, dimension: 雪夜添炭}
+    - {ep: 27, point: 细问起居, category: service, dimension: 晨昏知暖}
+    - {ep: 28, point: 出诊请医, category: service, dimension: 请医问凶}
+    - {ep: 29, point: 分利让客, category: service, dimension: 压岁分润}
+    - {ep: 30, point: 危机关怀, category: service, dimension: 恩义两全}

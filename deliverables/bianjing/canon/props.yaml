@@ -13,4 +13,5 @@ props:
       注销: []
     instances:
       - {id: KEFANG_PEIZHAO, tier: 铜, holder: PEI_ZHAO, initial_state: 持有}
+      - {id: KEFANG_YANNIAN, tier: 铜, holder: YANNIAN, initial_state: 持有}
       - {id: KEFANG_WOOD, tier: 木, holder: SHEN_WENZHOU, initial_state: 库存}
