@@ -27,7 +27,7 @@ func (p Problem) String() string {
 var entityTypes = map[string]bool{"character": true, "place": true, "brand": true, "org": true}
 var seasons = map[string]bool{"spring": true, "summer": true, "autumn": true, "winter": true}
 
-// Validate 对六张表做全量结构校验，返回问题列表；空列表 = canon 可用。
+// Validate 对六张表 + 可选 config 做全量结构校验，返回问题列表；空列表 = canon 可用。
 func (c *Canon) Validate() []Problem {
 	var ps []Problem
 	ps = append(ps, c.validateEntities()...)
@@ -36,6 +36,53 @@ func (c *Canon) Validate() []Problem {
 	ps = append(ps, c.validateLines()...)
 	ps = append(ps, c.validateSellingPoints()...)
 	ps = append(ps, c.validateTimeline()...)
+	ps = append(ps, c.validateConfig()...)
+	return ps
+}
+
+func (c *Canon) validateConfig() []Problem {
+	var ps []Problem
+	cfg := c.Config
+	// 只有显式配置了才校验；零值 config 合法（门禁走 WithDefaults）。
+	if cfg.Arc.Character != "" {
+		if ch, ok := c.EntityByID(cfg.Arc.Character); !ok {
+			ps = append(ps, Problem{Table: TableConfig, Field: "arc.character",
+				Message: fmt.Sprintf("%q 不在 entities 中", cfg.Arc.Character)})
+		} else if ch.Type != "character" {
+			ps = append(ps, Problem{Table: TableConfig, Field: "arc.character",
+				Message: fmt.Sprintf("%q 不是 character", cfg.Arc.Character)})
+		}
+	}
+	if cfg.Format.CharsTolerance < 0 || cfg.Format.CharsTolerance > 1 {
+		ps = append(ps, Problem{Table: TableConfig, Field: "format.chars_tolerance",
+			Message: "必须在 (0,1] 区间"})
+	}
+	if cfg.HookPayoff.WarnAfterEps > cfg.HookPayoff.FailAfterEps && cfg.HookPayoff.FailAfterEps > 0 {
+		ps = append(ps, Problem{Table: TableConfig, Field: "hook_payoff",
+			Message: fmt.Sprintf("warn_after_eps(%d) 不得大于 fail_after_eps(%d)",
+				cfg.HookPayoff.WarnAfterEps, cfg.HookPayoff.FailAfterEps)})
+	}
+	seenCat := map[string]bool{}
+	for _, cat := range cfg.Compliance.Categories {
+		if cat.ID == "" {
+			ps = append(ps, Problem{Table: TableConfig, Field: "compliance.categories",
+				Message: "存在空 id"})
+			continue
+		}
+		if seenCat[cat.ID] {
+			ps = append(ps, Problem{Table: TableConfig, Field: "compliance.categories." + cat.ID,
+				Message: "id 重复"})
+		}
+		seenCat[cat.ID] = true
+		if cat.Level != ComplianceHard && cat.Level != ComplianceFlag {
+			ps = append(ps, Problem{Table: TableConfig, Field: "compliance.categories." + cat.ID,
+				Message: fmt.Sprintf("level %q 不在 {hard,flag}", cat.Level)})
+		}
+		if len(cat.Patterns) == 0 {
+			ps = append(ps, Problem{Table: TableConfig, Field: "compliance.categories." + cat.ID,
+				Message: "patterns 为空"})
+		}
+	}
 	return ps
 }
 

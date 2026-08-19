@@ -118,6 +118,44 @@ func TestApplyDayMonotonic(t *testing.T) {
 	}
 }
 
+// M4 弧线台账：单调不倒退 + 单步 ≤+1（复现"开局即内部人/23集老板"类缺陷的台账面）。
+func TestApplyArcMonotonic(t *testing.T) {
+	e := NewEngine(demoCanon(t))
+	var vs []Violation
+	vs = append(vs, e.ApplyEp(ep(1, Delta{Arc: &ArcAdvance{Level: 0, Cost: "初来乍到，只能旁观"}}))...)
+	if len(vs) != 0 {
+		t.Fatalf("首次申报 L0 不应违规：%s", FormatViolations(vs))
+	}
+	vs = append(vs, e.ApplyEp(ep(5, Delta{Arc: &ArcAdvance{Level: 1, Cost: "替店里挡了一场官差"}}))...)
+	if len(vs) != 0 {
+		t.Fatalf("L0→L1 不应违规：%s", FormatViolations(vs))
+	}
+	vs = append(vs, e.ApplyEp(ep(6, Delta{Arc: &ArcAdvance{Level: 0}}))...) // 倒退
+	vs = append(vs, e.ApplyEp(ep(7, Delta{Arc: &ArcAdvance{Level: 4}}))...) // 跳级
+	if !hasMsg(vs, "权限等级倒退") {
+		t.Fatalf("等级倒退必须违规，得到：%s", FormatViolations(vs))
+	}
+	if !hasMsg(vs, "权限等级跳级") {
+		t.Fatalf("等级跳级必须违规，得到：%s", FormatViolations(vs))
+	}
+	if got := e.Snapshots()[1].ArcLevel; got != 1 {
+		t.Fatalf("快照应记录 ArcLevel=1，得到 %d", got)
+	}
+}
+
+// M4 群演登记：Crowd 申报累计进台账，供可拍性门做全剧配额判定。
+func TestApplyCrowdLedger(t *testing.T) {
+	e := NewEngine(demoCanon(t))
+	e.ApplyEp(ep(1, Delta{Crowd: true, Scenes: []string{"大堂", "后厨"}}))
+	e.ApplyEp(ep(2, Delta{Crowd: true}))
+	if got := len(e.Ledger.CrowdEps); got != 2 {
+		t.Fatalf("群演场面应累计 2 集，得到 %d", got)
+	}
+	if s := e.Snapshots()[0]; len(s.Scenes) != 2 || !s.Crowd {
+		t.Fatalf("快照应携带本集 scenes/crowd：%v/%v", s.Scenes, s.Crowd)
+	}
+}
+
 // PBT-1 台账守恒：对任意随机开/闭序列，凡闭了未开（或重复闭）的 id，
 // ApplyEp 必产出至少一条守恒类违规；只闭已开且未闭的 id 则零守恒违规。
 func TestPropertyLedgerConservation(t *testing.T) {

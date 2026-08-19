@@ -22,8 +22,9 @@ cmd/songguard ─▶ internal/songguard ─▶ internal/engine ─▶ internal/r
   Sweep 巡检、Linkage 联动。新增门禁只改 `registry.go` 一行 + 对应 rules 子包。
 - **internal/rules（门禁）**：`Rule` 深契约（ID + Check 两个面）+ 共享文本工具。
   M2 五门在 `rules/gates`；M4 每门独立子包 `rules/<gate>`，子包只导出一个 `Rule()` 构造器。
-- **internal/canon（M1）**：六张 canon 表（Entity Registry / Prop Bible / World Rules /
-  Line Assets / 卖点排期 / Timeline）的 Go 类型、YAML 加载与结构校验。
+- **internal/canon（M1+M4）**：六张 canon 表（Entity Registry / Prop Bible / World Rules /
+  Line Assets / 卖点排期 / Timeline）+ 可选第七张 `config.yaml`（M4 门禁阈值与词表，
+  缺省走 `WithDefaults()`，见 ADR-0002）的 Go 类型、YAML 加载与结构校验。
   不可变数据定义，不依赖任何其它 internal 包。
 - **internal/state（M1）**：delta 协议（meetings / hooks / prop_changes / line_uses /
   selling_point / emotion / time / new_facts / state_changes / arc / scenes）+ apply +

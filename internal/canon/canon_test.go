@@ -1,6 +1,7 @@
 package canon
 
 import (
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -41,6 +42,108 @@ func TestValidateDemoClean(t *testing.T) {
 	c := loadDemo(t)
 	if ps := c.Validate(); len(ps) != 0 {
 		t.Fatalf("演示 canon 应零问题，得到：%s", problems(ps))
+	}
+}
+
+// M4：config.yaml 可选——六表 canon（无 config）合法，门禁走 WithDefaults。
+func TestConfigOptionalAndDefaults(t *testing.T) {
+	c := loadDemo(t)
+	if ps := c.Validate(); len(ps) != 0 {
+		t.Fatalf("无 config 的 canon 应合法，得到：%s", problems(ps))
+	}
+	d := c.Config.WithDefaults()
+	if d.Format.CharsTolerance != 0.10 || d.HookPayoff.WarnAfterEps != 6 ||
+		d.HookPayoff.FailAfterEps != 10 || d.Emotion.MaxStreak != 3 ||
+		d.Producibility.MaxNamedCharsPerEp != 5 || d.Producibility.MaxScenesPerEp != 3 {
+		t.Fatalf("默认值不符 issue #1 §B-2 推荐值: %+v", d)
+	}
+	// 默认词表必须直接覆盖 issue #1 缺陷清单里已发生的项。
+	if _, ok := d.Hygiene.Typos["愣"]; !ok {
+		t.Fatal("默认错别字表应含 issue #1 实际缺陷项（愣→怔）")
+	}
+	if !containsStr(d.Producibility.CameraTerms, "镜头一抬") {
+		t.Fatal("默认镜头语言表应含 issue #1 实际泄漏项（镜头一抬）")
+	}
+	found := false
+	for _, cat := range d.Compliance.Categories {
+		if cat.ID == "official-favor" && containsStr(cat.Patterns, "铺条官路") {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatal("默认合规词表应含 issue #1 §3-5 官商往来项（铺条官路）")
+	}
+}
+
+// M4：显式配置的 config 会被结构校验（arc 指向不存在实体 / level 非法 / 阈值反置）。
+func TestValidateConfigProblems(t *testing.T) {
+	c := loadDemo(t)
+	c.Config = Config{
+		Arc:        ArcConfig{Character: "NOBODY"},
+		Format:     FormatConfig{CharsTolerance: 1.5},
+		HookPayoff: HookPayoffConfig{WarnAfterEps: 20, FailAfterEps: 10},
+		Compliance: ComplianceConfig{Categories: []ComplianceCategory{
+			{ID: "x", Level: "soft", Patterns: []string{"foo"}},
+		}},
+	}
+	ps := c.Validate()
+	for _, want := range []string{"arc.character", "format.chars_tolerance", "hook_payoff", "compliance"} {
+		if !containsField(ps, TableConfig, want) {
+			t.Fatalf("config 问题 %q 未检出，得到：%s", want, problems(ps))
+		}
+	}
+}
+
+// M4：config.yaml 从目录加载的 yaml tag round-trip（复制 demo 目录 + 注入 config）。
+func TestLoadConfigYAML(t *testing.T) {
+	dir := t.TempDir()
+	for _, name := range []string{TableEntities, TableProps, TableWorld, TableLines, TableSellingPoints, TableTimeline, "meta"} {
+		raw, err := os.ReadFile(filepath.Join("testdata", "demo", name+".yaml"))
+		if err != nil {
+			t.Fatalf("read demo %s.yaml: %v", name, err)
+		}
+		if err := os.WriteFile(filepath.Join(dir, name+".yaml"), raw, 0o644); err != nil {
+			t.Fatalf("copy %s.yaml: %v", name, err)
+		}
+	}
+	cfg := `config:
+  arc:
+    character: LIU_QINGMEI
+    max_level: 5
+    min_eps_per_step: 5
+  emotion:
+    types: [惊叹, 危机]
+    max_streak: 3
+  hygiene:
+    typos: {愣: 怔}
+    garbled_patterns: [暖幢栋]
+  compliance:
+    categories:
+      - id: official-favor
+        level: hard
+        patterns: [铺条官路]
+`
+	if err := os.WriteFile(filepath.Join(dir, TableConfig+".yaml"), []byte(cfg), 0o644); err != nil {
+		t.Fatalf("write config.yaml: %v", err)
+	}
+	c, err := Load(dir)
+	if err != nil {
+		t.Fatalf("Load with config: %v", err)
+	}
+	if c.Config.Arc.Character != "LIU_QINGMEI" || c.Config.Arc.MinEpsPerStep != 5 {
+		t.Fatalf("arc 段未解码: %+v", c.Config.Arc)
+	}
+	if c.Config.Emotion.MaxStreak != 3 || len(c.Config.Emotion.Types) != 2 {
+		t.Fatalf("emotion 段未解码: %+v", c.Config.Emotion)
+	}
+	if c.Config.Hygiene.Typos["愣"] != "怔" || len(c.Config.Hygiene.GarbledPatterns) != 1 {
+		t.Fatalf("hygiene 段未解码: %+v", c.Config.Hygiene)
+	}
+	if got := c.Config.Compliance.Categories[0]; got.ID != "official-favor" || got.Level != ComplianceHard {
+		t.Fatalf("compliance 段未解码: %+v", got)
+	}
+	if ps := c.Validate(); len(ps) != 0 {
+		t.Fatalf("合法 config 应零问题，得到：%s", problems(ps))
 	}
 }
 
@@ -154,6 +257,15 @@ func containsTable(ps []Problem, table string) bool {
 func containsField(ps []Problem, table, field string) bool {
 	for _, p := range ps {
 		if p.Table == table && strings.HasPrefix(p.Field, field) {
+			return true
+		}
+	}
+	return false
+}
+
+func containsStr(xs []string, want string) bool {
+	for _, x := range xs {
+		if x == want {
 			return true
 		}
 	}
