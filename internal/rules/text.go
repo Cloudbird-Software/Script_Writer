@@ -5,7 +5,17 @@ import (
 	"unicode"
 )
 
-// Sentences 按中文句读切分（。！？；!?; 与换行），保留原文片段，去掉空白句。
+// IsSentenceBreak 报告 r 是否句读符（。！？；!?; 与换行）。Sentences 切分与
+// voice 门禁的说话语境判定共用同一套句读边界。
+func IsSentenceBreak(r rune) bool {
+	switch r {
+	case '。', '！', '？', '；', '!', '?', ';', '\n':
+		return true
+	}
+	return false
+}
+
+// Sentences 按中文句读切分，保留原文片段，去掉空白句。
 func Sentences(text string) []string {
 	var out []string
 	var cur strings.Builder
@@ -16,12 +26,9 @@ func Sentences(text string) []string {
 		cur.Reset()
 	}
 	for _, r := range text {
-		switch r {
-		case '。', '！', '？', '；', '!', '?', ';', '\n':
-			cur.WriteRune(r)
+		cur.WriteRune(r)
+		if IsSentenceBreak(r) {
 			flush()
-		default:
-			cur.WriteRune(r)
 		}
 	}
 	flush()
@@ -53,13 +60,39 @@ func FirstN(text string, n int) string {
 	return b.String()
 }
 
-// LastN 返回文本末 n 个 rune。
-func LastN(text string, n int) string {
-	rs := []rune(text)
-	if len(rs) <= n {
-		return text
+// quotePairs 是中文引号配对表（引文接地门与声音指纹门共用同一扫描口径）。
+var quotePairs = map[rune]rune{'『': '』', '「': '」', '“': '”'}
+
+// QuoteSpan 是一对引号的开口/闭口 rune 下标。
+type QuoteSpan struct{ Open, Close int }
+
+// QuoteSpans 抽取 rs 中全部引号对（『』「」“”）的下标；未闭合的开口引号跳过。
+func QuoteSpans(rs []rune) []QuoteSpan {
+	var out []QuoteSpan
+	for i := 0; i < len(rs); i++ {
+		closeR, ok := quotePairs[rs[i]]
+		if !ok {
+			continue
+		}
+		for j := i + 1; j < len(rs); j++ {
+			if rs[j] == closeR {
+				out = append(out, QuoteSpan{i, j})
+				break
+			}
+		}
 	}
-	return string(rs[len(rs)-n:])
+	return out
+}
+
+// PickupKeywordHit 报告承接关键词是否出现在文本中（钩子回收门与 ±1 集联动
+// 校验共用）；关键词表中的零值字符串不计为命中，空表不命中。
+func PickupKeywordHit(keywords []string, text string) bool {
+	for _, kw := range keywords {
+		if kw != "" && strings.Contains(text, kw) {
+			return true
+		}
+	}
+	return false
 }
 
 var fullWidthPunct = "，。：；！？“”‘’（）《》、—…·"
@@ -171,7 +204,7 @@ func lev(a, b []rune) int {
 			if a[i-1] == b[j-1] {
 				cost = 0
 			}
-			cur[j] = min3(prev[j]+1, cur[j-1]+1, prev[j-1]+cost)
+			cur[j] = min(prev[j]+1, cur[j-1]+1, prev[j-1]+cost)
 		}
 		prev, cur = cur, prev
 	}
@@ -180,16 +213,6 @@ func lev(a, b []rune) int {
 
 // Lev 导出编辑距离（子包门禁复用）。
 func Lev(a, b string) int { return lev([]rune(a), []rune(b)) }
-
-func min3(a, b, c int) int {
-	if b < a {
-		a = b
-	}
-	if c < a {
-		a = c
-	}
-	return a
-}
 
 // Similarity 归一化编辑相似度（1 = 相同）。
 func Similarity(a, b string) float64 {

@@ -36,10 +36,10 @@ func (rule) Check(in rules.Input) []state.Violation {
 	lengths := map[string][]int{}
 	for _, ep := range in.Episodes {
 		rs := []rune(ep.Text)
-		for _, q := range quoteSpans(rs) {
-			ctxStart := contextStart(rs, q.open)
-			if id, _ := rules.SoleCharacter(in.Canon, string(rs[ctxStart:q.open])); id != "" {
-				lengths[id] = append(lengths[id], q.end-q.open-1) // 引号内容 rune 数
+		for _, q := range rules.QuoteSpans(rs) {
+			ctxStart := contextStart(rs, q.Open)
+			if id, _ := rules.SoleCharacter(in.Canon, string(rs[ctxStart:q.Open])); id != "" {
+				lengths[id] = append(lengths[id], q.Close-q.Open-1) // 引号内容 rune 数
 			}
 		}
 	}
@@ -84,34 +84,11 @@ func (rule) Check(in rules.Input) []state.Violation {
 	return nil
 }
 
-// span 是一对引号的开口/闭口 rune 下标。
-type span struct{ open, end int }
-
-// quoteSpans 抽取 『』「」「"" 引号对（开口下标与闭口下标）。
-func quoteSpans(rs []rune) []span {
-	pairs := map[rune]rune{'『': '』', '「': '」', '“': '”'}
-	var out []span
-	for i := 0; i < len(rs); i++ {
-		close, ok := pairs[rs[i]]
-		if !ok {
-			continue
-		}
-		for j := i + 1; j < len(rs); j++ {
-			if rs[j] == close {
-				out = append(out, span{i, j})
-				break
-			}
-		}
-	}
-	return out
-}
-
 // contextStart 返回开口引号之前的最近句读边界（含）之后的位置：
 // 说话语境 = 上一个句读到开口引号之间的文本。
 func contextStart(rs []rune, open int) int {
 	for i := open - 1; i > 0; i-- {
-		switch rs[i] {
-		case '。', '！', '？', '；', '!', '?', ';', '\n':
+		if rules.IsSentenceBreak(rs[i]) {
 			return i + 1
 		}
 	}

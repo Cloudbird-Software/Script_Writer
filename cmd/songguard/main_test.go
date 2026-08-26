@@ -4,14 +4,20 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 )
 
 // buildCLI 构建一次二进制供冒烟测试复用（测试工作目录 = 包目录）。
+// 二进制名带平台后缀：Windows 上 exec 需 .exe 扩展名才能被找到。
 func buildCLI(t *testing.T) string {
 	t.Helper()
-	bin := filepath.Join(t.TempDir(), "songguard")
+	name := "songguard"
+	if runtime.GOOS == "windows" {
+		name += ".exe"
+	}
+	bin := filepath.Join(t.TempDir(), name)
 	out, err := exec.Command("go", "build", "-o", bin, "../../cmd/songguard").CombinedOutput()
 	if err != nil {
 		t.Fatalf("build: %v\n%s", err, out)

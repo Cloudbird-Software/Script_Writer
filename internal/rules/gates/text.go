@@ -31,7 +31,7 @@ func Format(c *canon.Canon, eps []state.Episode, _ []state.Snapshot) []state.Vio
 					Gate: state.GateFormat, Episode: ep.Ep, Position: "字数",
 					Expected: fmt.Sprintf("[%d, %d]（目标 %d ±10%%）", int(lo), int(hi), ep.TargetChars),
 					Actual:   fmt.Sprint(n), Severity: state.SeverityError,
-					Message: fmt.Sprintf("字数越界（issue #1：实测 270–700 字 2.5 倍方差）"),
+					Message: "字数越界（issue #1：实测 270–700 字 2.5 倍方差）",
 				})
 			}
 		}
