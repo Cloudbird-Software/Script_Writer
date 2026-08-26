@@ -2,7 +2,6 @@ package engine
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/Cloudbird-Software/Script_Writer/internal/canon"
 	"github.com/Cloudbird-Software/Script_Writer/internal/rules"
@@ -58,14 +57,7 @@ func checkJoints(from, to state.Episode) []state.Violation {
 			})
 			continue
 		}
-		found := false
-		for _, kw := range h.PickupKeywords {
-			if kw != "" && strings.Contains(opening, kw) {
-				found = true
-				break
-			}
-		}
-		if !found {
+		if !rules.PickupKeywordHit(h.PickupKeywords, opening) {
 			vs = append(vs, state.Violation{
 				Gate: "linkage", Episode: to.Ep,
 				Position: "loop." + h.LoopID,

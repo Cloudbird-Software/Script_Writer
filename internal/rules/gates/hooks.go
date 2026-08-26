@@ -29,16 +29,18 @@ func QuoteGrounding(c *canon.Canon, eps []state.Episode, _ []state.Snapshot) []s
 			if !hasTrigger {
 				continue
 			}
-			for _, q := range quoteSpans(sent) {
-				if q == "" || len([]rune(q)) < 2 {
+			sentRs := []rune(sent)
+			for _, q := range rules.QuoteSpans(sentRs) {
+				quote := string(sentRs[q.Open+1 : q.Close])
+				if quote == "" || len([]rune(quote)) < 2 {
 					continue
 				}
-				if !grounded(q, prior.String()) {
+				if !grounded(quote, prior.String()) {
 					vs = append(vs, state.Violation{
 						Gate: state.GateQuoteGrounding, Episode: ep.Ep,
 						Position: fmt.Sprintf("第%d句", si+1),
 						Expected: "前文出现过的原话（逐字或相似度 ≥0.8）",
-						Actual:   q, Severity: state.SeverityError,
+						Actual:   quote, Severity: state.SeverityError,
 						Message: "引文无出处（凭空引文，E30『过客有期』类缺陷）",
 					})
 				}
@@ -47,24 +49,6 @@ func QuoteGrounding(c *canon.Canon, eps []state.Episode, _ []state.Snapshot) []s
 		prior.WriteString(rules.Normalize(ep.Text))
 	}
 	return vs
-}
-
-// quoteSpans 抽取 『』「」“” 引号内容。
-func quoteSpans(sent string) []string {
-	var out []string
-	pairs := map[rune]rune{'『': '』', '「': '」', '“': '”'}
-	rs := []rune(sent)
-	for i := 0; i < len(rs); i++ {
-		if close, ok := pairs[rs[i]]; ok {
-			for j := i + 1; j < len(rs); j++ {
-				if rs[j] == close {
-					out = append(out, string(rs[i+1:j]))
-					break
-				}
-			}
-		}
-	}
-	return out
 }
 
 // grounded 判断引文 q（原文）是否能在归一化前文 corpus 中找到出处。
@@ -126,14 +110,7 @@ func HookPayoff(c *canon.Canon, eps []state.Episode, snaps []state.Snapshot) []s
 					})
 					continue
 				}
-				found := false
-				for _, kw := range h.PickupKeywords {
-					if kw != "" && strings.Contains(opening, kw) {
-						found = true
-						break
-					}
-				}
-				if !found {
+				if !rules.PickupKeywordHit(h.PickupKeywords, opening) {
 					vs = append(vs, state.Violation{
 						Gate: state.GateHookPayoff, Episode: ep.Ep,
 						Position: "delta.hooks_opened." + h.LoopID,
